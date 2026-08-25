@@ -12,6 +12,8 @@ jobs:
   crawl:
     if: startsWith(github.event.issue.title, '[crawl]')
     runs-on: ubuntu-latest
+    env:
+      CAMPUS_JOBS_PROXY: ${{ secrets.CAMPUS_JOBS_PROXY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,7 +25,7 @@ jobs:
         run: |
           python -m pip install -U pip
           pip install -e '.[browser]'
-          python -m playwright install --with-deps chromium
+          google-chrome --version || google-chrome-stable --version || chromium --version || true
       - name: Crawl
         id: crawl
         run: |
