@@ -21,6 +21,8 @@ permissions:
 jobs:
   crawl:
     runs-on: ubuntu-latest
+    env:
+      CAMPUS_JOBS_PROXY: ${{ secrets.CAMPUS_JOBS_PROXY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,7 +30,7 @@ jobs:
           python-version: "3.12"
       - run: |
           pip install -e '.[browser]'
-          python -m playwright install --with-deps chromium
+          google-chrome --version || google-chrome-stable --version || chromium --version || true
       - run: |
           campus-jobs '${{ inputs.url }}' --keyword '${{ inputs.keyword }}' --scope '${{ inputs.scope }}' --max-jobs '${{ inputs.max_jobs }}' --out jobs.json
       - uses: actions/upload-artifact@v4
