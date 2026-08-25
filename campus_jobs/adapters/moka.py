@@ -5,12 +5,14 @@ import json
 import re
 from urllib.parse import urlparse
 
+from bs4 import BeautifulSoup
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.padding import PKCS7
 
 from campus_jobs.http import PublicClient
 from campus_jobs.models import CrawlOptions, CrawlResult, Job
 from campus_jobs.utils import clean_text, unique_keep_order
+
 from .base import BaseAdapter
 
 
@@ -35,12 +37,17 @@ class MokaAdapter(BaseAdapter):
         return kind, org, int(site_raw)
 
     @staticmethod
-    def _init_data(html: str) -> dict:
-        m = re.search(r'<input[^>]+id=["\']init-data["\'][^>]+value=["\']([^"\']+)["\']', html, re.I)
-        if not m:
+    def _init_data(html_text: str) -> dict:
+        # Regex extraction is brittle because Moka's HTML-escaped JSON can
+        # contain quotes/apostrophes inside long JD snippets. Let an HTML
+        # parser handle attribute boundaries/entities, then parse the value.
+        node = BeautifulSoup(html_text, "html.parser").find("input", id="init-data")
+        if node is None:
             return {}
-        import html as html_mod
-        return json.loads(html_mod.unescape(m.group(1)))
+        raw = node.get("value")
+        if not isinstance(raw, str) or not raw.strip():
+            return {}
+        return json.loads(raw)
 
     @staticmethod
     def _decrypt(envelope: dict, aes_iv: str) -> dict:
@@ -79,7 +86,15 @@ class MokaAdapter(BaseAdapter):
                 if options.keyword:
                     body["keyword"] = options.keyword
                 endpoint = f"https://app.mokahr.com/api/outer/ats-apply/website/jobs/v2?orgId={org}"
-                r = client.post(endpoint, json=body, headers={"Referer": portal_url, "Origin": "https://app.mokahr.com", "Accept": "application/json"})
+                r = client.post(
+                    endpoint,
+                    json=body,
+                    headers={
+                        "Referer": portal_url,
+                        "Origin": "https://app.mokahr.com",
+                        "Accept": "application/json",
+                    },
+                )
                 payload = self._decrypt(r.json(), aes_iv)
                 decoded_data = payload.get("data") or {}
                 rows = decoded_data.get("jobs") or []
@@ -118,7 +133,11 @@ class MokaAdapter(BaseAdapter):
                         dr = client.post(
                             "https://app.mokahr.com/api/outer/ats-apply/website/job",
                             json={"orgId": org, "siteId": str(site_id), "jobId": job.id, "locale": "zh-CN"},
-                            headers={"Referer": portal_url, "Origin": "https://app.mokahr.com", "Accept": "application/json"},
+                            headers={
+                                "Referer": portal_url,
+                                "Origin": "https://app.mokahr.com",
+                                "Accept": "application/json",
+                            },
                         )
                         detail_payload = self._decrypt(dr.json(), aes_iv)
                         decoded_data = detail_payload.get("data") or {}
