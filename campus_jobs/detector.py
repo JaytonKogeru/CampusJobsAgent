@@ -1,13 +1,35 @@
 from __future__ import annotations
 
 from .adapters import (
-    AshbyAdapter, ATSXAdapter, GenericBrowserAdapter, GreenhouseAdapter, LeverAdapter, MokaAdapter,
-    OppoAdapter, SmartRecruitersAdapter, VivoCampusAdapter, WecruitAdapter, WorkdayAdapter,
+    ATSXAdapter,
+    AshbyAdapter,
+    GenericBrowserAdapter,
+    GreenhouseAdapter,
+    JobProBridgeAdapter,
+    LeverAdapter,
+    MokaAdapter,
+    OppoAdapter,
+    SmartRecruitersAdapter,
+    VivoCampusAdapter,
+    WecruitAdapter,
+    WorkdayAdapter,
 )
 
 ADAPTERS = sorted(
-    [MokaAdapter, VivoCampusAdapter, OppoAdapter, ATSXAdapter, WecruitAdapter, GreenhouseAdapter, LeverAdapter,
-     AshbyAdapter, SmartRecruitersAdapter, WorkdayAdapter, GenericBrowserAdapter],
+    [
+        MokaAdapter,
+        VivoCampusAdapter,
+        OppoAdapter,
+        ATSXAdapter,
+        WecruitAdapter,
+        GreenhouseAdapter,
+        LeverAdapter,
+        AshbyAdapter,
+        SmartRecruitersAdapter,
+        WorkdayAdapter,
+        JobProBridgeAdapter,
+        GenericBrowserAdapter,
+    ],
     key=lambda cls: cls.priority,
     reverse=True,
 )
