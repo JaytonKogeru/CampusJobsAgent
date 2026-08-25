@@ -1,0 +1,78 @@
+{
+  "adapter": "job-pro-bridge",
+  "source_url": "https://join.qq.com/post.html",
+  "count": 5,
+  "warnings": [],
+  "jobs": [
+    {
+      "id": "1282707398326592512",
+      "title": "AI全栈工程师",
+      "url": "https://join.qq.com/post_detail.html?postid=1282707398326592512",
+      "company": "tencent",
+      "location": "深圳总部 北京 上海 广州 成都 杭州",
+      "department": "CDG CSIG IEG PCG TEG WXG",
+      "function": "应届毕业生",
+      "recruit_type": "应届毕业生",
+      "description": "",
+      "requirements": "",
+      "source": "join.qq.com",
+      "published_at": ""
+    },
+    {
+      "id": "1282707395466077185",
+      "title": "AI应用工程师",
+      "url": "https://join.qq.com/post_detail.html?postid=1282707395466077185",
+      "company": "tencent",
+      "location": "深圳总部 北京 上海 广州 成都",
+      "department": "CDG CSIG IEG PCG TEG WXG",
+      "function": "应届毕业生",
+      "recruit_type": "应届毕业生",
+      "description": "",
+      "requirements": "",
+      "source": "join.qq.com",
+      "published_at": ""
+    },
+    {
+      "id": "1282707395466077186",
+      "title": "AI算法工程",
+      "url": "https://join.qq.com/post_detail.html?postid=1282707395466077186",
+      "company": "tencent",
+      "location": "深圳总部 北京 上海 广州",
+      "department": "CSIG IEG PCG TEG WXG",
+      "function": "应届毕业生",
+      "recruit_type": "应届毕业生",
+      "description": "",
+      "requirements": "",
+      "source": "join.qq.com",
+      "published_at": ""
+    },
+    {
+      "id": "1283126456553382912",
+      "title": "AI产品经理",
+      "url": "https://join.qq.com/post_detail.html?postid=1283126456553382912",
+      "company": "tencent",
+      "location": "深圳总部 北京 上海 广州",
+      "department": "CDG CSIG IEG PCG TEG WXG",
+      "function": "应届毕业生",
+      "recruit_type": "应届毕业生",
+      "description": "",
+      "requirements": "",
+      "source": "join.qq.com",
+      "published_at": ""
+    },
+    {
+      "id": "1283126495480718338",
+      "title": "AI安全技术工程师（风控算法）",
+      "url": "https://join.qq.com/post_detail.html?postid=1283126495480718338",
+      "company": "tencent",
+      "location": "深圳总部 广州",
+      "department": "CDG CSIG IEG PCG TEG WXG",
+      "function": "应届毕业生",
+      "recruit_type": "应届毕业生",
+      "description": "",
+      "requirements": "",
+      "source": "join.qq.com",
+      "published_at": ""
+    }
+  ]
+}
