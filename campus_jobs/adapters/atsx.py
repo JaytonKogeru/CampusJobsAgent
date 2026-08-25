@@ -9,7 +9,13 @@ from .base import BaseAdapter
 
 
 class ATSXAdapter(BaseAdapter):
-    """Feishu Recruiting / ATSX family, including Xiaomi's mioffice fork."""
+    """Feishu Recruiting / ATSX family, including Xiaomi's mioffice fork.
+
+    Direct public API is preferred. Some ATSX tenants vary their edge behavior
+    by egress/headers; if the anonymous API rejects a runner (e.g. 405), we
+    transparently fall back to the Playwright/XHR adapter instead of failing
+    the crawl.
+    """
 
     name = "atsx"
     priority = 90
@@ -37,6 +43,17 @@ class ATSXAdapter(BaseAdapter):
         return headers
 
     def crawl(self, url: str, options: CrawlOptions) -> CrawlResult:
+        try:
+            return self._crawl_api(url, options)
+        except Exception as exc:  # noqa: BLE001 - deliberate resilience boundary
+            from .generic_browser import GenericBrowserAdapter
+
+            fallback = GenericBrowserAdapter().crawl(url, options)
+            fallback.adapter = f"{self.name}->generic-browser"
+            fallback.warnings.insert(0, f"ATSX direct API failed; browser fallback used: {type(exc).__name__}: {exc}")
+            return fallback
+
+    def _crawl_api(self, url: str, options: CrawlOptions) -> CrawlResult:
         p = urlparse(url)
         host = p.hostname or ""
         root = f"{p.scheme or 'https'}://{host}"
@@ -47,16 +64,19 @@ class ATSXAdapter(BaseAdapter):
         seen: set[str] = set()
         with PublicClient(options.timeout) as client:
             for page in range(options.max_pages):
+                limit = min(max(options.page_size, 1), 100)
                 body = {
                     "keyword": options.keyword,
-                    "limit": min(max(options.page_size, 1), 100),
-                    "offset": page * min(max(options.page_size, 1), 100),
+                    "limit": limit,
+                    "offset": page * limit,
                     "portal_type": 3,
                     "portal_entrance": 1,
                     "language": "zh",
                 }
                 r = client.post(search_api, headers=headers, json=body)
                 payload = r.json()
+                if payload.get("code") not in (None, 0):
+                    raise RuntimeError(f"ATSX upstream error: {payload.get('message') or payload.get('code')}")
                 data = payload.get("data") or {}
                 rows = data.get("job_post_list") or []
                 if not rows:
@@ -86,7 +106,7 @@ class ATSXAdapter(BaseAdapter):
                     jobs.append(job)
                     if len(jobs) >= options.max_jobs:
                         break
-                if len(jobs) >= options.max_jobs or len(rows) < body["limit"]:
+                if len(jobs) >= options.max_jobs or len(rows) < limit:
                     break
 
             if options.include_details:
