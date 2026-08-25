@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from campus_jobs.http import PublicClient
 from campus_jobs.models import CrawlOptions, CrawlResult, Job
@@ -12,9 +12,8 @@ class ATSXAdapter(BaseAdapter):
     """Feishu Recruiting / ATSX family, including Xiaomi's mioffice fork.
 
     Direct public API is preferred. Some ATSX tenants vary their edge behavior
-    by egress/headers; if the anonymous API rejects a runner (e.g. 405), we
-    transparently fall back to the Playwright/XHR adapter instead of failing
-    the crawl.
+    by egress/headers; if the anonymous API rejects a runner, we transparently
+    fall back to the Playwright/XHR adapter instead of failing the crawl.
     """
 
     name = "atsx"
@@ -59,13 +58,15 @@ class ATSXAdapter(BaseAdapter):
         root = f"{p.scheme or 'https'}://{host}"
         search_api = f"{root}/api/v1/search/job/posts"
         headers = self._headers(host, options.scope)
+        query = parse_qs(p.query)
+        project_ids = [x for x in query.get("project", []) if x]
         jobs: list[Job] = []
         warnings: list[str] = []
         seen: set[str] = set()
         with PublicClient(options.timeout) as client:
             for page in range(options.max_pages):
                 limit = min(max(options.page_size, 1), 100)
-                body = {
+                body: dict[str, object] = {
                     "keyword": options.keyword,
                     "limit": limit,
                     "offset": page * limit,
@@ -73,6 +74,12 @@ class ATSXAdapter(BaseAdapter):
                     "portal_entrance": 1,
                     "language": "zh",
                 }
+                if options.scope == "campus":
+                    body["recruitment_id_list"] = ["201"]
+                elif options.scope == "intern":
+                    body["recruitment_id_list"] = ["202"]
+                if project_ids:
+                    body["subject_id_list"] = project_ids
                 r = client.post(search_api, headers=headers, json=body)
                 payload = r.json()
                 if payload.get("code") not in (None, 0):
