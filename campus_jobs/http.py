@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import random
 import time
 from typing import Any
@@ -17,9 +18,11 @@ UA = (
 class PublicClient:
     def __init__(self, timeout: float = 25.0):
         self.timeout = timeout
+        proxy = os.getenv("CAMPUS_JOBS_PROXY", "").strip() or None
         self.client = httpx.Client(
             timeout=timeout,
             follow_redirects=True,
+            proxy=proxy,
             headers={"User-Agent": UA, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"},
         )
 
@@ -28,7 +31,10 @@ class PublicClient:
 
     def request(self, method: str, url: str, *, retries: int = 2, **kwargs: Any) -> httpx.Response:
         assert_public_url(url)
-        safe_resolve_host(url)
+        # When a proxy is configured, DNS resolution belongs to the proxy and a
+        # local pre-resolution can both leak DNS and reject valid remote names.
+        if not os.getenv("CAMPUS_JOBS_PROXY", "").strip():
+            safe_resolve_host(url)
         last: Exception | None = None
         for attempt in range(retries + 1):
             try:
