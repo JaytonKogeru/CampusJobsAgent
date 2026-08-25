@@ -1,0 +1,37 @@
+name: Manual crawl
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Careers URL
+        required: true
+      keyword:
+        description: Optional keyword
+        required: false
+        default: ""
+      scope:
+        type: choice
+        options: [campus, intern, social, all]
+        default: campus
+      max_jobs:
+        required: false
+        default: "500"
+permissions:
+  contents: read
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          pip install -e '.[browser]'
+          python -m playwright install --with-deps chromium
+      - run: |
+          campus-jobs '${{ inputs.url }}' --keyword '${{ inputs.keyword }}' --scope '${{ inputs.scope }}' --max-jobs '${{ inputs.max_jobs }}' --out jobs.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: campus-jobs
+          path: jobs.json

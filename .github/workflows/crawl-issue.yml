@@ -1,0 +1,53 @@
+name: Crawl from issue
+on:
+  issues:
+    types: [opened, edited, labeled]
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: campus-jobs-crawler-write
+  cancel-in-progress: false
+jobs:
+  crawl:
+    if: startsWith(github.event.issue.title, '[crawl]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install crawler
+        run: |
+          python -m pip install -U pip
+          pip install -e '.[browser]'
+          python -m playwright install --with-deps chromium
+      - name: Crawl
+        id: crawl
+        run: |
+          python -m campus_jobs.issue_runner --event "$GITHUB_EVENT_PATH" --output-dir runs | tee /tmp/run.json
+          echo "count=$(python - <<'PY'
+          import json
+          print(json.load(open('/tmp/run.json'))['count'])
+          PY
+          )" >> "$GITHUB_OUTPUT"
+      - name: Commit normalized results
+        run: |
+          git config user.name "campus-jobs-agent[bot]"
+          git config user.email "campus-jobs-agent[bot]@users.noreply.github.com"
+          git add runs/
+          git diff --cached --quiet || git commit -m "crawl: issue #${{ github.event.issue.number }}"
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push
+      - name: Comment issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          FILE="runs/issue-${{ github.event.issue.number }}/summary.md"
+          {
+            echo "抓取完成，共发现 **${{ steps.crawl.outputs.count }}** 个岗位。"
+            echo
+            echo "结果已提交到：\`runs/issue-${{ github.event.issue.number }}/jobs.json\`"
+            echo
+            cat "$FILE"
+          } | gh issue comment "${{ github.event.issue.number }}" --body-file -

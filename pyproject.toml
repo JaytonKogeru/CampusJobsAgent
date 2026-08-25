@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "campus-jobs-agent"
+version = "0.2.0"
+description = "Universal public careers-site crawler for campus recruiting boards"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "CampusJobsAgent contributors"}]
+dependencies = [
+  "httpx>=0.27,<1",
+  "beautifulsoup4>=4.12,<5",
+  "cryptography>=42,<46",
+  "PyYAML>=6,<7",
+]
+
+[project.optional-dependencies]
+browser = ["playwright>=1.46,<2"]
+dev = ["pytest>=8,<9", "ruff>=0.6,<1"]
+
+[project.scripts]
+campus-jobs = "campus_jobs.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["campus_jobs*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
