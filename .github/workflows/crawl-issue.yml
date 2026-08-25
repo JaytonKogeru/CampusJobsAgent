@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -25,20 +27,22 @@ jobs:
       - name: Crawl
         id: crawl
         run: |
-          python -m campus_jobs.issue_runner --event "$GITHUB_EVENT_PATH" --output-dir runs | tee /tmp/run.json
-          echo "count=$(python - <<'PY'
-          import json
-          print(json.load(open('/tmp/run.json'))['count'])
-          PY
-          )" >> "$GITHUB_OUTPUT"
+          python -m campus_jobs.issue_runner --event "$GITHUB_EVENT_PATH" --output-dir runs > /tmp/run.json
+          cat /tmp/run.json
+          COUNT=$(python -c "import json; print(json.load(open('/tmp/run.json', encoding='utf-8'))['count'])")
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
       - name: Commit normalized results
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           git config user.name "campus-jobs-agent[bot]"
           git config user.email "campus-jobs-agent[bot]@users.noreply.github.com"
           git add runs/
-          git diff --cached --quiet || git commit -m "crawl: issue #${{ github.event.issue.number }}"
-          git pull --rebase origin "${GITHUB_REF_NAME}" || true
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "crawl: issue #${{ github.event.issue.number }}"
+            git pull --rebase origin "$DEFAULT_BRANCH"
+            git push origin "HEAD:$DEFAULT_BRANCH"
+          fi
       - name: Comment issue
         env:
           GH_TOKEN: ${{ github.token }}
