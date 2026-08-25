@@ -1,0 +1,9 @@
+{
+  "adapter": "moka-error",
+  "source_url": "https://app.mokahr.com/campus-recruitment/aftershokzhr/36940",
+  "count": 0,
+  "warnings": [
+    "crawl failed: JSONDecodeError: Unterminated string starting at: line 1 column 9809 (char 9808)"
+  ],
+  "jobs": []
+}
