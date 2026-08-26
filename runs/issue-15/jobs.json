@@ -1,0 +1,22 @@
+{
+  "adapter": "wecruit",
+  "source_url": "https://wecruit.hotjob.cn/SU63c50f8b0dcad47488052192/mc/detail?postId=810823&recruitType=campus",
+  "count": 1,
+  "warnings": [],
+  "jobs": [
+    {
+      "id": "6a88eeb668cc6f624f72b90c",
+      "title": "2027届校招-机器视觉开发岗（歌尔之翼））(049678)",
+      "url": "https://wecruit.hotjob.cn/SU63c50f8b0dcad47488052192/mc/detail?postId=6a88eeb668cc6f624f72b90c&recruitType=campus",
+      "company": "",
+      "location": "潍坊市、威海市",
+      "department": "人力资源本部",
+      "function": "研发技术",
+      "recruit_type": "校招",
+      "description": "1、业务支撑：负责BG内各SBU视觉业务的需求对接、设计开发与调试维护工作，保障业务的顺利开展与交付；\n2、视觉核心零组件产品开发：负责Gvision系列产品的规划、开发及迭代；\n3、AOI设备开发：负责AOI标准检测设备的规划、开发、交付及迭代；\n4、视觉技术规划与提升：负责视觉领域的技术调研分析、技术战略制定、创新与技术能力提升。",
+      "requirements": "1、熟练操作office办公软件及其他辅助软件\n2、掌握Visual Studio、PyCharm等相关编程语言的编译及调试工具，以及Git、SVN等版本控制工具\n3、能够通过自身经验指导检测软件工程师的开发工作\n4、具备一定的英文能力，能够独立书写中英文版文档与检测方案",
+      "source": "wecruit.hotjob.cn",
+      "published_at": ""
+    }
+  ]
+}
