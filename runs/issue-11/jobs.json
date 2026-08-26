@@ -1,0 +1,22 @@
+{
+  "adapter": "wecruit",
+  "source_url": "https://wecruit.hotjob.cn/SU63c50f8b0dcad47488052192/mc/detail?postId=810823&recruitType=campus",
+  "count": 1,
+  "warnings": [],
+  "jobs": [
+    {
+      "id": "6a1536d8f3f38374dadff5b9",
+      "title": "2027届校招-声学研发岗（精英、歌尔之翼）(048770)",
+      "url": "https://wecruit.hotjob.cn/SU63c50f8b0dcad47488052192/mc/detail?postId=6a1536d8f3f38374dadff5b9&recruitType=campus",
+      "company": "",
+      "location": "重庆市、南京市、青岛市、潍坊市",
+      "department": "人力资源本部",
+      "function": "研发技术",
+      "recruit_type": "校招",
+      "description": "方向1：声学研发方向 - 青岛/潍坊/南京\n1、参与耳机、智能眼镜等音频类产品的声学设计开发，负责其中声学元器件及声腔相关设计部分的仿真，性能调试，并负责输出声学相关设计文档；\n2、负责音频类产品的声学设计需求评估，完成可行性分析与相关测试，并输出可行性设计报告；\n3、负责新声学技术和新声学器件的应用研究，保障产品声学设计竞争力；\n方向2：汽车声学研发方向 - 重庆\n1、负责整车主动降噪系统的匹配、调试、测试与优化；\n2、主导整车主动降噪系统的整车集成、性能验证、仿真分析等工作。",
+      "requirements": "方向1：声学研发方向 - 青岛/潍坊/南京\n1、硕士及以上学历，声学相关专业毕业；\n2、有音频类产品开发经验者优先，有噪声抑制控制开发经验者优先；\n3、精通声学设计仿真软件（Microcap等）；\n4、熟练使用测试及音频信号处理软件（SoundCheck，AP,Klippel,Audition, cooledit,等）；\n5.具备熟练英语口语能力\n方向2：汽车声学研发方向 - 重庆\n1、硕士及以上学历，熟悉汽车NVH开发或主动降噪系统开发流程，深入理解整车噪声传递路径及路噪产生机理，熟练使用测试设备（LMS/Head Acoustics）及分析软件，具备ANC算法调试及仿真经验者优先。",
+      "source": "wecruit.hotjob.cn",
+      "published_at": ""
+    }
+  ]
+}
