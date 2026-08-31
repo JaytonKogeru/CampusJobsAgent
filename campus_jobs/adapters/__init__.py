@@ -4,6 +4,7 @@ from .generic_browser import GenericBrowserAdapter
 from .greenhouse import GreenhouseAdapter
 from .jobpro_bridge import JobProBridgeAdapter
 from .lever import LeverAdapter
+from .midea import MideaCampusAdapter
 from .moka import MokaAdapter
 from .oppo import OppoAdapter
 from .smartrecruiters import SmartRecruitersAdapter
@@ -18,6 +19,7 @@ __all__ = [
     "GreenhouseAdapter",
     "JobProBridgeAdapter",
     "LeverAdapter",
+    "MideaCampusAdapter",
     "MokaAdapter",
     "OppoAdapter",
     "SmartRecruitersAdapter",
