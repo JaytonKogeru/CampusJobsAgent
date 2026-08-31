@@ -1,0 +1,22 @@
+{
+  "adapter": "generic-browser",
+  "source_url": "https://careers.midea.com/schoolOut/post",
+  "count": 1,
+  "warnings": [],
+  "jobs": [
+    {
+      "id": "https://recruit.midea.com/recruitOut/ihr/home/index",
+      "title": "社会招聘",
+      "url": "https://recruit.midea.com/recruitOut/ihr/home/index",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "careers.midea.com",
+      "published_at": ""
+    }
+  ]
+}
