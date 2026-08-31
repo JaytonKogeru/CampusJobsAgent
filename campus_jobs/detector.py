@@ -7,6 +7,7 @@ from .adapters import (
     GreenhouseAdapter,
     JobProBridgeAdapter,
     LeverAdapter,
+    MideaCampusAdapter,
     MokaAdapter,
     OppoAdapter,
     SmartRecruitersAdapter,
@@ -17,6 +18,7 @@ from .adapters import (
 
 ADAPTERS = sorted(
     [
+        MideaCampusAdapter,
         MokaAdapter,
         VivoCampusAdapter,
         OppoAdapter,
