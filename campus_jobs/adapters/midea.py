@@ -30,7 +30,6 @@ class MideaCampusAdapter(BaseAdapter):
     @staticmethod
     def _project_score(project: dict, scope: str) -> tuple[int, int]:
         name = clean_text(project.get("projectRuleName"))
-        low = name.lower()
         season = clean_text(project.get("season"))
         total = int(project.get("number") or 0)
         employ = str(project.get("employementCategory") or "")
@@ -57,8 +56,6 @@ class MideaCampusAdapter(BaseAdapter):
             if employ == "1":
                 score += 25
 
-        # Prefer normal graduate projects over special/legacy projects when
-        # names are weak, then use advertised job count as a tie breaker.
         if ptype == "1":
             score += 10
         return score, total
@@ -96,14 +93,14 @@ class MideaCampusAdapter(BaseAdapter):
                 return CrawlResult(self.name, url, [], ["Midea active project has no projectRuleId"])
 
             project_name = clean_text(selected.get("projectRuleName"))
-            advertised = int(selected.get("number") or 0)
             if project_name:
-                warnings.append(f"selected project: {project_name} ({project_id}), advertised={advertised}")
+                warnings.append(f"selected project: {project_name} ({project_id})")
 
             endpoint = f"{root}/backend/school/position/common/position/list"
-            page_size = min(max(options.page_size, 10), 100)
+            requested_page_size = min(max(options.page_size, 10), 100)
             seen: set[str] = set()
-            total = advertised
+            total = 0
+            previous_seen_count = -1
 
             for page in range(1, options.max_pages + 1):
                 body = {
@@ -113,7 +110,7 @@ class MideaCampusAdapter(BaseAdapter):
                     "workPlaceCodes": [],
                     "projectRuleId": project_id,
                     "pageIndex": page,
-                    "pageSize": page_size,
+                    "pageSize": requested_page_size,
                 }
                 r = client.post(endpoint, json=body, headers=headers)
                 data = (r.json().get("data") or {})
@@ -150,15 +147,11 @@ class MideaCampusAdapter(BaseAdapter):
                     requirements = clean_text(dto.get("jobRequirement"))
                     position_code = clean_text(dto.get("positionCode"))
 
-                    # Midea's SPA currently does not expose a stable standalone
-                    # public detail route for each card; keep a stable source
-                    # page URL and preserve IDs/codes in extra for future routing.
-                    job_url = f"{root}/schoolOut/post"
                     jobs.append(
                         Job(
                             id=jid,
                             title=title,
-                            url=job_url,
+                            url=f"{root}/schoolOut/post",
                             location=location,
                             function=function,
                             recruit_type="实习" if options.scope == "intern" else "校招",
@@ -180,7 +173,15 @@ class MideaCampusAdapter(BaseAdapter):
                     break
                 if total and len(seen) >= total:
                     break
-                if len(rows) < page_size:
+                # Midea currently caps the effective response page size (e.g.
+                # 20) even when a larger pageSize is requested, so row count
+                # cannot be used as an end-of-pagination signal. Stop only if
+                # the next page fails to contribute any new IDs.
+                if len(seen) == previous_seen_count:
                     break
+                previous_seen_count = len(seen)
+
+            if total and len(seen) < total and len(jobs) < options.max_jobs:
+                warnings.append(f"pagination incomplete: fetched={len(seen)}, api_total={total}, max_pages={options.max_pages}")
 
         return CrawlResult(self.name, url, jobs, warnings)
