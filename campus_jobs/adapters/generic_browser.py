@@ -28,10 +28,16 @@ def _json_shape(data: object) -> str:
                 value = data.get(key)
                 if isinstance(value, dict):
                     parts.append(f"{key}:dict({list(value.keys())[:12]})")
+                    for subkey in list(value.keys())[:8]:
+                        subvalue = value.get(subkey)
+                        if isinstance(subvalue, list):
+                            sample = subvalue[0] if subvalue else None
+                            if isinstance(sample, dict):
+                                parts.append(f"{key}.{subkey}:list[{len(subvalue)}]({list(sample.keys())[:20]})")
                 elif isinstance(value, list):
                     sample = value[0] if value else None
                     if isinstance(sample, dict):
-                        parts.append(f"{key}:list[{len(value)}]({list(sample.keys())[:12]})")
+                        parts.append(f"{key}:list[{len(value)}]({list(sample.keys())[:20]})")
                     else:
                         parts.append(f"{key}:list[{len(value)}]")
             return "; ".join(parts)
@@ -126,6 +132,14 @@ class GenericBrowserAdapter(BaseAdapter):
                         network_debug.append(
                             f"{response.status} {req.method} {response.url} | post={post_data or '-'} | {_json_shape(data)}"
                         )
+                        if "/position/common/position/list" in low and isinstance(data, dict):
+                            inner = data.get("data") or {}
+                            rows = inner.get("data") if isinstance(inner, dict) else None
+                            if isinstance(rows, list) and rows:
+                                sample = json.dumps(rows[0], ensure_ascii=False, default=str)
+                                if len(sample) > 5000:
+                                    sample = sample[:5000] + "..."
+                                network_debug.append("LIST_ITEM_SAMPLE=" + sample)
                 except Exception:
                     return
 
