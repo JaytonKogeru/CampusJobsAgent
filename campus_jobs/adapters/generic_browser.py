@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -15,6 +16,33 @@ ID_KEYS = ["id", "jobId", "job_id", "postId", "positionId", "JobAdId"]
 LOC_KEYS = ["location", "city", "workPlace", "workLocation", "workCity", "LocationName", "workPlaceStr"]
 DESC_KEYS = ["description", "jobDescription", "duty", "Duty", "workContent", "responsibility"]
 REQ_KEYS = ["requirement", "requirements", "Require", "serviceCondition", "qualification"]
+
+
+def _json_shape(data: object) -> str:
+    """Return a compact structural summary for diagnostics without dumping payloads."""
+    try:
+        if isinstance(data, dict):
+            keys = list(data.keys())[:20]
+            parts = [f"dict keys={keys}"]
+            for key in keys[:8]:
+                value = data.get(key)
+                if isinstance(value, dict):
+                    parts.append(f"{key}:dict({list(value.keys())[:12]})")
+                elif isinstance(value, list):
+                    sample = value[0] if value else None
+                    if isinstance(sample, dict):
+                        parts.append(f"{key}:list[{len(value)}]({list(sample.keys())[:12]})")
+                    else:
+                        parts.append(f"{key}:list[{len(value)}]")
+            return "; ".join(parts)
+        if isinstance(data, list):
+            sample = data[0] if data else None
+            if isinstance(sample, dict):
+                return f"list[{len(data)}] sample_keys={list(sample.keys())[:20]}"
+            return f"list[{len(data)}]"
+        return type(data).__name__
+    except Exception:
+        return type(data).__name__
 
 
 class GenericBrowserAdapter(BaseAdapter):
@@ -36,6 +64,7 @@ class GenericBrowserAdapter(BaseAdapter):
         jobs: dict[str, Job] = {}
         warnings: list[str] = []
         host = urlparse(url).hostname or ""
+        network_debug: list[str] = []
 
         def absorb_json(data: object, base_url: str) -> None:
             for obj in walk_dicts(data):
@@ -81,9 +110,22 @@ class GenericBrowserAdapter(BaseAdapter):
                 try:
                     ct = (response.headers.get("content-type") or "").lower()
                     low = response.url.lower()
-                    if "json" not in ct and not any(x in low for x in ["job", "position", "recruit", "career", "zhaopin"]):
+                    looks_relevant = "json" in ct or any(x in low for x in ["job", "position", "post", "recruit", "career", "school", "campus", "zhaopin"])
+                    if not looks_relevant:
                         return
-                    absorb_json(response.json(), response.url)
+                    try:
+                        data = response.json()
+                    except Exception:
+                        return
+                    absorb_json(data, response.url)
+                    if len(network_debug) < 30:
+                        req = response.request
+                        post_data = clean_text(req.post_data or "")
+                        if len(post_data) > 500:
+                            post_data = post_data[:500] + "..."
+                        network_debug.append(
+                            f"{response.status} {req.method} {response.url} | post={post_data or '-'} | {_json_shape(data)}"
+                        )
                 except Exception:
                     return
 
@@ -133,6 +175,17 @@ class GenericBrowserAdapter(BaseAdapter):
                     jobs.setdefault(href, Job(id=href, title=title, url=href, source=host))
                 except Exception:
                     pass
+
+            if len(jobs) <= 2:
+                try:
+                    body_text = clean_text(page.locator("body").inner_text())
+                    if len(body_text) > 1200:
+                        body_text = body_text[:1200] + "..."
+                    warnings.append(f"browser final_url={page.url}; body_sample={body_text}")
+                except Exception:
+                    pass
+                if network_debug:
+                    warnings.append("browser API trace:\n" + "\n".join(network_debug))
             browser.close()
 
         values = list(jobs.values())[: options.max_jobs]
