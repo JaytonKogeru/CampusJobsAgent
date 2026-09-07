@@ -10,6 +10,7 @@ from .adapters import (
     MideaCampusAdapter,
     MokaAdapter,
     OppoAdapter,
+    QQDocsSourceAdapter,
     SmartRecruitersAdapter,
     VivoCampusAdapter,
     WecruitAdapter,
@@ -18,6 +19,7 @@ from .adapters import (
 
 ADAPTERS = sorted(
     [
+        QQDocsSourceAdapter,
         MideaCampusAdapter,
         MokaAdapter,
         VivoCampusAdapter,
