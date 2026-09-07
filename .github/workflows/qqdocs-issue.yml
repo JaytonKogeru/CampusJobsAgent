@@ -43,6 +43,7 @@ jobs:
       - name: Comment issue
         env:
           GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
         run: |
           python - <<'PY' > /tmp/comment.md
           import json, os
@@ -54,7 +55,4 @@ jobs:
           print()
           print(f"结果：`{p}`")
           PY
-          gh issue comment "${{ github.event.issue.number }}" --body-file /tmp/comment.md
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE: ${{ github.event.issue.number }}
+          gh issue comment "${ISSUE}" --body-file /tmp/comment.md
