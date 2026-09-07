@@ -1,0 +1,60 @@
+name: Tencent Docs source from issue
+on:
+  issues:
+    types: [opened, edited]
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: campus-jobs-crawler-write
+  cancel-in-progress: false
+jobs:
+  dump:
+    if: startsWith(github.event.issue.title, '[qqdocs]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Parse issue and dump sheet
+        env:
+          BODY: ${{ github.event.issue.body }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          PAD=$(printf '%s\n' "$BODY" | sed -n 's/^pad_id:[[:space:]]*//p' | head -1)
+          SUB=$(printf '%s\n' "$BODY" | sed -n 's/^sub_id:[[:space:]]*//p' | head -1)
+          END=$(printf '%s\n' "$BODY" | sed -n 's/^endrow:[[:space:]]*//p' | head -1)
+          END=${END:-3000}
+          test -n "$PAD" && test -n "$SUB"
+          mkdir -p "sources/qqdocs"
+          python scripts/qqdocs_dump.py --pad-id "$PAD" --sub-id "$SUB" --endrow "$END" --output "sources/qqdocs/issue-${ISSUE}.json" | tee /tmp/meta.json
+      - name: Commit source snapshot
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git config user.name "campus-jobs-agent[bot]"
+          git config user.email "campus-jobs-agent[bot]@users.noreply.github.com"
+          git add sources/qqdocs/
+          if ! git diff --cached --quiet; then
+            git commit -m "source: Tencent Docs issue #${{ github.event.issue.number }}"
+            git pull --rebase origin "$DEFAULT_BRANCH"
+            git push origin "HEAD:$DEFAULT_BRANCH"
+          fi
+      - name: Comment issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY' > /tmp/comment.md
+          import json, os
+          p=f"sources/qqdocs/issue-{os.environ['ISSUE']}.json"
+          d=json.load(open(p,encoding='utf-8'))
+          print(f"腾讯文档抓取完成，共 **{d['count']}** 条记录。")
+          print()
+          print("字段：" + "、".join(d.get('fields',[])))
+          print()
+          print(f"结果：`{p}`")
+          PY
+          gh issue comment "${{ github.event.issue.number }}" --body-file /tmp/comment.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
