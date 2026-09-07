@@ -1,16 +1,26 @@
 name: Crawl from issue
+
 on:
   issues:
-    types: [opened, edited, labeled]
+    types: [opened, edited, labeled, reopened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Existing crawl issue number to retry
+        required: true
+        type: string
+
 permissions:
   contents: write
   issues: write
+
 concurrency:
   group: campus-jobs-crawler-write
   cancel-in-progress: false
+
 jobs:
   crawl:
-    if: startsWith(github.event.issue.title, '[crawl]')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.issue.title, '[crawl]')
     runs-on: ubuntu-latest
     env:
       CAMPUS_JOBS_PROXY: ${{ secrets.CAMPUS_JOBS_PROXY }}
@@ -18,21 +28,41 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       - name: Install crawler
         run: |
           python -m pip install -U pip
           pip install -e '.[browser]'
           google-chrome --version || google-chrome-stable --version || chromium --version || true
+
+      - name: Resolve crawl event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ISSUE_NO="${{ inputs.issue_number }}"
+            gh api "repos/${GITHUB_REPOSITORY}/issues/${ISSUE_NO}" \
+              --jq '{issue:{number:.number,title:.title,body:.body}}' > /tmp/crawl-event.json
+            CRAWL_EVENT=/tmp/crawl-event.json
+          else
+            ISSUE_NO="${{ github.event.issue.number }}"
+            CRAWL_EVENT="$GITHUB_EVENT_PATH"
+          fi
+          echo "ISSUE_NO=$ISSUE_NO" >> "$GITHUB_ENV"
+          echo "CRAWL_EVENT=$CRAWL_EVENT" >> "$GITHUB_ENV"
+
       - name: Crawl
         id: crawl
         run: |
-          python -m campus_jobs.issue_runner --event "$GITHUB_EVENT_PATH" --output-dir runs > /tmp/run.json
+          python -m campus_jobs.issue_runner --event "$CRAWL_EVENT" --output-dir runs > /tmp/run.json
           cat /tmp/run.json
           COUNT=$(python -c "import json; print(json.load(open('/tmp/run.json', encoding='utf-8'))['count'])")
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
       - name: Commit normalized results
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
@@ -41,19 +71,20 @@ jobs:
           git config user.email "campus-jobs-agent[bot]@users.noreply.github.com"
           git add runs/
           if ! git diff --cached --quiet; then
-            git commit -m "crawl: issue #${{ github.event.issue.number }}"
+            git commit -m "crawl: issue #${ISSUE_NO}"
             git pull --rebase origin "$DEFAULT_BRANCH"
             git push origin "HEAD:$DEFAULT_BRANCH"
           fi
+
       - name: Comment issue
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          FILE="runs/issue-${{ github.event.issue.number }}/summary.md"
+          FILE="runs/issue-${ISSUE_NO}/summary.md"
           {
             echo "抓取完成，共发现 **${{ steps.crawl.outputs.count }}** 个岗位。"
             echo
-            echo "结果已提交到：\`runs/issue-${{ github.event.issue.number }}/jobs.json\`"
+            echo "结果已提交到：\`runs/issue-${ISSUE_NO}/jobs.json\`"
             echo
             cat "$FILE"
-          } | gh issue comment "${{ github.event.issue.number }}" --body-file -
+          } | gh issue comment "$ISSUE_NO" --body-file -
