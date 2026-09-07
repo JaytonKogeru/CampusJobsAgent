@@ -1,0 +1,48 @@
+scope: campus
+page_size: 50
+max_pages: 20
+max_jobs: 300
+details: true
+max_targets: 200
+
+targets:
+  - name: OPPO
+    url: https://careers.oppo.com/university/oppo/campus
+  - name: vivo
+    url: https://hr-campus.vivo.com/jobs
+  - name: 小米
+    url: https://xiaomi.jobs.f.mioffice.cn/campus/
+  - name: 韶音
+    url: https://app.mokahr.com/campus-recruitment/aftershokzhr/36940
+  - name: 歌尔
+    url: https://wecruit.hotjob.cn/SU63c50f8b0dcad47488052192/mc/detail?postId=810823&recruitType=campus
+  - name: 长鑫存储
+    url: https://cxmt.zhiye.com/campus/jobs
+  - name: 海尔
+    url: https://maker.haier.net/client/campus/index
+  - name: 海信
+    url: https://jobs.hisense.com
+  - name: TCL
+    url: https://zhaopin.tcl.com/campus/recruiting.html
+  - name: 普渡机器人
+    url: https://pudutech.zhiye.com/campus
+  - name: 智元机器人
+    url: https://agirobot.jobs.feishu.cn/campus
+  - name: 千寻智能
+    url: https://nwd4iy9rd2s.jobs.feishu.cn/campusofSpiritAI
+  - name: 银河通用
+    url: https://app.mokahr.com/campus-recruitment/yinhetongyong/165930
+  - name: 小鹏
+    url: https://xiaopeng.jobs.feishu.cn/campus
+  - name: 理想
+    url: https://www.lixiang.com/employ/campus/list.html?job_mode=1
+  - name: 小马智行
+    url: https://campus.pony.ai
+  - name: 芯原
+    url: https://campus.51job.com/VeriSilicon2027
+  - name: 汇顶科技
+    url: https://goodix.zhiye.com/Campus
+  - name: 华力微电子
+    url: https://app.mokahr.com/campus-recruitment/huahong/70000
+  - name: 中芯国际
+    url: https://smic.zhiye.com/campus
