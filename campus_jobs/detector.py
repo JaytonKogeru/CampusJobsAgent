@@ -3,6 +3,7 @@ from __future__ import annotations
 from .adapters import (
     ATSXAdapter,
     AshbyAdapter,
+    BambuLabAdapter,
     BeisenZhiyeAdapter,
     GenericBrowserAdapter,
     GreenhouseAdapter,
@@ -22,6 +23,7 @@ from .adapters import (
 ADAPTERS = sorted(
     [
         QQDocsSourceAdapter,
+        BambuLabAdapter,
         MideaCampusAdapter,
         MokaAdapter,
         VivoCampusAdapter,
