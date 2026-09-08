@@ -10,6 +10,7 @@ from .moka import MokaAdapter
 from .oppo import OppoAdapter
 from .qqdocs_source import QQDocsSourceAdapter
 from .smartrecruiters import SmartRecruitersAdapter
+from .tplink import TPLinkGlobalAdapter
 from .vivo import VivoCampusAdapter
 from .wecruit import WecruitAdapter
 from .workday import WorkdayAdapter
@@ -27,6 +28,7 @@ __all__ = [
     "OppoAdapter",
     "QQDocsSourceAdapter",
     "SmartRecruitersAdapter",
+    "TPLinkGlobalAdapter",
     "VivoCampusAdapter",
     "WecruitAdapter",
     "WorkdayAdapter",
