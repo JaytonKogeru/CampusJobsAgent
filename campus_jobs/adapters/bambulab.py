@@ -80,7 +80,11 @@ class BambuLabAdapter(ATSXAdapter):
                 nav_url = self._page_url(url, options.keyword, page_index + 1, requested_limit)
                 try:
                     with page.expect_response(
-                        lambda r: "/api/v1/search/job/posts" in r.url and r.request.method == "POST",
+                        lambda r: (
+                            "/api/v1/search/job/posts" in r.url
+                            and r.request.method == "POST"
+                            and r.status == 200
+                        ),
                         timeout=int(options.timeout * 1000),
                     ) as response_info:
                         page.goto(
