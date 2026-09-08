@@ -1,5 +1,6 @@
 from .ashby import AshbyAdapter
 from .atsx import ATSXAdapter
+from .bambulab import BambuLabAdapter
 from .beisen_zhiye import BeisenZhiyeAdapter
 from .generic_browser import GenericBrowserAdapter
 from .greenhouse import GreenhouseAdapter
@@ -18,6 +19,7 @@ from .workday import WorkdayAdapter
 __all__ = [
     "ATSXAdapter",
     "AshbyAdapter",
+    "BambuLabAdapter",
     "BeisenZhiyeAdapter",
     "GenericBrowserAdapter",
     "GreenhouseAdapter",
