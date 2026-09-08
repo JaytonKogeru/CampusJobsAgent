@@ -190,12 +190,21 @@ class GenericBrowserAdapter(BaseAdapter):
                 except Exception:
                     pass
 
-            if len(jobs) <= 2:
+            informative_jobs = sum(
+                bool(job.location or job.description or job.requirements or job.department or job.function)
+                for job in jobs.values()
+            )
+            low_quality = len(jobs) <= 2 or (
+                len(jobs) >= 5 and informative_jobs < max(3, len(jobs) // 2)
+            )
+            if low_quality:
                 try:
                     body_text = clean_text(page.locator("body").inner_text())
                     if len(body_text) > 1200:
                         body_text = body_text[:1200] + "..."
-                    warnings.append(f"browser final_url={page.url}; body_sample={body_text}")
+                    warnings.append(
+                        f"browser final_url={page.url}; quality={informative_jobs}/{len(jobs)} informative; body_sample={body_text}"
+                    )
                 except Exception:
                     pass
                 if network_debug:
