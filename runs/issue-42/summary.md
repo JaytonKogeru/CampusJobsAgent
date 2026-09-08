@@ -1,0 +1,75 @@
+# Crawl result
+
+- Adapter: `generic-browser`
+- Source: https://apply.careers.dji.com/campus-recruitment/dji/143359?locale=zh-CN#/?location%5B0%5D=%E6%B7%B1%E5%9C%B3%E5%B8%82&page=1&anchorName=jobsList
+- Jobs: **11**
+- Warnings: **2**
+
+| # | 岗位 | 地点 | 职能/部门 | 链接 |
+|---:|---|---|---|---|
+| 1 | DJI 招聘隐私政策 |  |  | [详情](https://apply.careers.dji.com/campus-recruitment/dji/143359?locale=zh-CN#/?location%5B0%5D=%E6%B7%B1%E5%9C%B3%E5%B8%82&page=1&anchorName=jobsList#job=100132206) |
+| 2 | 隐私协议 |  |  | [详情](https://apply.careers.dji.com/campus-recruitment/dji/143359?locale=zh-CN#/?location%5B0%5D=%E6%B7%B1%E5%9C%B3%E5%B8%82&page=1&anchorName=jobsList#job=100105554) |
+| 3 | 社会招聘 |  |  | [详情](https://apply.careers.dji.com/social-recruitment/dji/170070#/jobs) |
+| 4 | 校园招聘 |  |  | [详情](https://careers.dji.com/zh-CN/campus) |
+| 5 | 人在大疆 |  |  | [详情](https://careers.dji.com/zh-CN/better-us) |
+| 6 | 关于大疆 |  |  | [详情](https://careers.dji.com/zh-CN/about) |
+| 7 | 拓疆者校园招聘 |  |  | [详情](https://careers.dji.com/zh-CN/campus/recruitment) |
+| 8 | 实习生招聘 |  |  | [详情](https://apply.careers.dji.com/social-recruitment/dji/168240) |
+| 9 | RM 专属招聘通道 |  |  | [详情](https://www.robomaster.com/zh-CN/recruit?djifrom=top_title) |
+| 10 | 校招职位 |  |  | [详情](https://apply.careers.dji.com/campus-recruitment/dji/143359?locale=zh-CN#/jobs) |
+| 11 | DJI 招聘隐私政策
+DJI 招聘隐私政策 |  |  | [详情](https://apply.careers.dji.com/campus-recruitment/dji/143359?hash=%23%2Fpage%2F%E9%9A%90%E7%A7%81%E6%94%BF%E7%AD%96) |
+
+## Warnings
+- browser final_url=https://apply.careers.dji.com/campus-recruitment/dji/143359?locale=zh-CN#/?location%5B0%5D=%E6%B7%B1%E5%9C%B3%E5%B8%82&page=1&anchorName=jobsList; quality=0/11 informative; body_sample=社会招聘
+校园招聘
+人在大疆
+关于大疆
+登录
+校园招聘
+拓疆者校园招聘
+实习生招聘
+RM 专属招聘通道
+校招职位
+找到你心仪的职位
+职位筛选
+清除
+已选 1 条件
+|
+86 结果
+职位搜索
+职能类型
+工作地点
+深圳市
+深圳市
+上海市
+上海市
+北京市
+北京市
+在招职位
+分享
+热招
+数字管理研发工程师（深圳）
+数字化建设
+数字化建设
+|
+广东·深圳市
+广东·深圳市
+职位简介：过去，我们通过建设系统、梳理流程和沉淀数据，让业务运行有迹可循、决策有据可依。但在许多关键环节，决策仍高度依赖个人经验与直觉。我们相信，优秀的系统不应只是记录和传递信息，更应理解业务逻辑、沉淀专家经验，并辅助人作出更高质量的决策。因此，我们正在将模糊的业务直觉和隐藏在经验中的判断规则，转化为清晰、可验证、可运行的代码与算法。这不仅是对旧系统的升级，更是基于业务底层逻辑进行的全新构建；不仅是流程优化，更是企业管理方式的系统性变革。为此，我们正式启动面向未来的人才孵化计划，寻找具备技术基础、业务洞察力和构建能力的高潜校招生。你将有机会与大疆核心管理层及业务团队一起，探索AI时代企业业务运转的本质，构建全新的数字化管理体系。我们寻找的不是单纯的执行者，而是能够定义问题、设计方案并推动落地的构建者。职位吸引点：1. 多1次投递机会：同学可额外投递本职位，不占校招投递次数；2. 参与顶层决策的机会：你将有机会与核心高层一同探讨公司的顶层设计；3. 顶尖导师同行：公司核心管理层会是你的导师，顶尖的业务专家和开发团队会是你的工作伙伴；4. 加速晋升路径：表现突出者有破格晋升机会，成长为技术专家或公司核心管理者；5. TOP级薪酬回报：你将获得与项目价值相匹配、极具竞争力的薪酬回报；6. 前沿AI资源倾斜：多款最先进的AI大模型不限量使用。工作职责：1. 深入大疆研发、供应链、营销与服务等真实业务场景，参与或主导业务流程梳理与方案设计；将新品预测、销售渠道分货与库存分配、物流路线规划、研发项目管理等复杂决策问题，拆解为清晰、可量化、可验证的规则体系；2. 基于业务目标和规则体系，设计数字化解决方案，将业务逻辑准确转化为系统功能、数据模型与自动化逻辑，确保方案技术可行、结果可验证；3. 与业务专家、产品经理和开发团队紧密协作，推进需求分析、方案评审、开发实现、测试验收及上线运营，减少重复性人工判断，推动关键业务环节实现自动化、智能化运行；4. 识别各业务条线中高度依赖人工经验的决策环节，探索AI、算法与数字化技术的应用方式，推动业务从“经验驱动”逐步升级为“规则与数据驱动”。任职要求：1. 理工科相关专业背景，包括但不限于计算机科学与技术、软件工程、人工智能、自动化、电子信息、通信工程、数学、物理等；掌握至少一种编程语言，具备良好的代码实现能力和工程思维；2. 具备较完整的产品、系统或技术项目经验，并在项目中...
+- browser API trace:
+200 GET https://apply.careers.dji.com/api/env | post=- | dict keys=['code', 'msg', 'data']; data:dict(['CLUSTER', 'NODE_ENV', 'PUBLIC_DOMAIN', 'CDN_DOMAIN', 'PASSPORT_HOST', 'SOCKET_HOST', 'BI_REPORTS_HOST', 'MAIN_HOST', 'PEOPLE_HOST', 'POSTER_HOST', 'IS_DINGTALK', 'LANGUAGE_PACK'])
+200 POST https://apply.careers.dji.com/api/outer/ats-apply/privacy-policy/get | post={"orgId":"dji","scope":"visitWebSite","locale":"zh-CN","businessId":"143359"} | dict keys=['code', 'codeType', 'data', 'msg', 'success']; data:list[1](['checkSeparately', 'checkTiming', 'content', 'contentVersion', 'id', 'isDefault', 'locale', 'name', 'policyStyle', 'version'])
+200 POST https://apply.careers.dji.com/api/outer/ats-apply/website/listCountryCallingCodes | post={"orgId":"dji"} | dict keys=['code', 'codeType', 'data', 'msg', 'success']; data:dict(['countryCallingCodes', 'enableCampusSiteAbroadPhone']); data.countryCallingCodes:list[234](['cnName', 'code', 'enName', 'validRegex'])
+200 POST https://sentry-fe.mokahr.com/api/98/envelope/?sentry_key=4d94d9a5e9d642e49cbc13ebf3dcb858&sentry_version=7 | post={"sent_at":"2026-09-08T04:35:27.209Z","sdk":{"name":"sentry.javascript.browser","version":"6.19.1"}}
+{"type":"session"}
+{"sid":"7e01c43e930f40cfb11243b5ee15bc6b","init":true,"started":"2026-09-08T04:35:27.208Z","timestamp":"2026-09-08T04:35:27.208Z","status":"ok","errors":0,"attrs":{"release":"20260907-1905-d65f8-release","environment":"prod-ali","user_agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36"}} | dict keys=[]
+200 POST https://apply.careers.dji.com/api/outer/ats-apply/website/group-by-job | post={"orgId":"dji","siteId":143359,"locale":"zh-CN"} | dict keys=['data', 'necromancer']
+200 POST https://apply.careers.dji.com/api/outer/ats-apply/website/jobs/departments/flat | post={"orgId":"dji","siteId":143359,"locale":"zh-CN"} | dict keys=['code', 'codeType', 'data', 'msg', 'success']; data:list[17](['id', 'label'])
+200 POST https://apply.careers.dji.com/api/outer/ats-apply/website/jobs/departments/structure | post={"orgId":"dji","siteId":143359,"locale":"zh-CN"} | dict keys=['code', 'codeType', 'data', 'msg', 'success']; data:list[18](['id', 'label', 'parentId'])
+200 POST https://apply.careers.dji.com/api/outer/ats-apply/privacy-policy/get | post={"orgId":"dji","scope":"recruitment","locale":"zh-CN","businessId":143359} | dict keys=['code', 'codeType', 'data', 'msg', 'success']; data:list[2](['checkSeparately', 'checkTiming', 'content', 'contentVersion', 'id', 'isDefault', 'locale', 'name', 'policyStyle', 'version'])
+200 POST https://apply.careers.dji.com/api/outer/ats-apply/store/filters | post={"orgId":"dji","siteId":"143359","locale":"zh-CN"} | dict keys=['code', 'codeType', 'data', 'msg', 'success']; data:list[0]
+200 GET https://apply.careers.dji.com/api/extension-server/extension/list-by-org?orgId=dji | post=- | dict keys=['code', 'data']; data:dict(['extensions']); data.extensions:list[1](['name', 'apps'])
+200 POST https://sentry-fe.mokahr.com/api/98/envelope/?sentry_key=4d94d9a5e9d642e49cbc13ebf3dcb858&sentry_version=7 | post={"event_id":"7bf041ce9d554c00bb7ecfb314d75b11","sent_at":"2026-09-08T04:35:28.665Z","sdk":{"name":"sentry.javascript.browser","version":"6.19.1"}}
+{"type":"transaction","sample_rates":[{}]}
+{"contexts":{"trace":{"op":"pageload","span_id":"bcb7f3a55435fbd1","tags":{"effectiveConnectionType":"4g","deviceMemory":"16","hardwareConcurrency":"4","sentry_reportAllChanges":false},"trace_id":"a183c5e0033f4410aaebdf218901695c"}},"spans":[{"description":"redirect","op":"browser","parent_span_id":"bcb7f3a55... | dict keys=['id']
+200 POST https://apply.careers.dji.com/api/outer/ats-apply/website/jobs/v2 | post={"orgId":"dji","siteId":"143359","limit":30,"offset":0,"needStat":true,"jobIdTopList":[],"customFields":{},"site":"campus","locationIds":[713263],"locale":"zh-CN"} | dict keys=['data', 'necromancer']
