@@ -2,7 +2,7 @@
 
 - Adapter: `atsx->browser-api`
 - Source: https://xiaomi.jobs.f.mioffice.cn/campus/position/list?share_token=MzsxNzg2MzM4NDM1Nzg4Ozc2MTU5NjcyMDU1MzI0MzY3OTA7MDsxLzI
-- Jobs: **500**
+- Jobs: **250**
 - Warnings: **2**
 
 | # | 岗位 | 地点 | 职能/部门 | 链接 |
