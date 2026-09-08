@@ -20,10 +20,20 @@ class MokaAdapter(BaseAdapter):
     name = "moka"
     priority = 100
     MAX_PAGE_SIZE = 50
+    PORTAL_KINDS = {"campus-recruitment", "social-recruitment", "recommendation-apply"}
 
     @classmethod
     def can_handle(cls, url: str) -> bool:
-        return (urlparse(url).hostname or "").lower() == "app.mokahr.com"
+        parsed = urlparse(url)
+        host = (parsed.hostname or "").lower()
+        if host == "app.mokahr.com":
+            return True
+        parts = [x for x in parsed.path.split("/") if x]
+        return (
+            len(parts) >= 3
+            and parts[0] in cls.PORTAL_KINDS
+            and bool(re.fullmatch(r"\d+", parts[2]))
+        )
 
     @staticmethod
     def _parse_portal(url: str) -> tuple[str, str, int]:
@@ -64,6 +74,9 @@ class MokaAdapter(BaseAdapter):
     def crawl(self, url: str, options: CrawlOptions) -> CrawlResult:
         kind, org, site_id = self._parse_portal(url)
         portal_url = url.split("#", 1)[0]
+        parsed_portal = urlparse(portal_url)
+        origin = f"{parsed_portal.scheme}://{parsed_portal.netloc}"
+        api_root = f"{origin}/api/outer/ats-apply"
         jobs: list[Job] = []
         warnings: list[str] = []
         seen: set[str] = set()
@@ -85,13 +98,13 @@ class MokaAdapter(BaseAdapter):
                 }
                 if options.keyword:
                     body["keyword"] = options.keyword
-                endpoint = f"https://app.mokahr.com/api/outer/ats-apply/website/jobs/v2?orgId={org}"
+                endpoint = f"{api_root}/website/jobs/v2"
                 r = client.post(
                     endpoint,
                     json=body,
                     headers={
                         "Referer": portal_url,
-                        "Origin": "https://app.mokahr.com",
+                        "Origin": origin,
                         "Accept": "application/json",
                     },
                 )
@@ -118,7 +131,7 @@ class MokaAdapter(BaseAdapter):
                         function=clean_text((item.get("zhineng") or {}).get("name")),
                         recruit_type=clean_text(item.get("commitment")),
                         description=clean_text(item.get("jobDescription")),
-                        source="app.mokahr.com",
+                        source=parsed_portal.hostname or "",
                         extra={**item, "moka_kind": kind, "site_id": site_id, "org": org},
                     )
                     jobs.append(job)
@@ -131,11 +144,11 @@ class MokaAdapter(BaseAdapter):
                 for job in jobs:
                     try:
                         dr = client.post(
-                            "https://app.mokahr.com/api/outer/ats-apply/website/job",
+                            f"{api_root}/website/job",
                             json={"orgId": org, "siteId": str(site_id), "jobId": job.id, "locale": "zh-CN"},
                             headers={
                                 "Referer": portal_url,
-                                "Origin": "https://app.mokahr.com",
+                                "Origin": origin,
                                 "Accept": "application/json",
                             },
                         )
