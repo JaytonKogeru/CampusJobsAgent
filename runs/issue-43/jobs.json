@@ -1,0 +1,64 @@
+{
+  "adapter": "generic-browser",
+  "source_url": "https://campus.51job.com/asml2027/",
+  "count": 4,
+  "warnings": [],
+  "jobs": [
+    {
+      "id": "https://campus.51job.com/asml2027/index.html",
+      "title": "企业简介",
+      "url": "https://campus.51job.com/asml2027/index.html",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "campus.51job.com",
+      "published_at": ""
+    },
+    {
+      "id": "https://campus.51job.com/asml2027/job.html",
+      "title": "热招职位",
+      "url": "https://campus.51job.com/asml2027/job.html",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "campus.51job.com",
+      "published_at": ""
+    },
+    {
+      "id": "https://campus.51job.com/asml2027/trip.html",
+      "title": "校招行程",
+      "url": "https://campus.51job.com/asml2027/trip.html",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "campus.51job.com",
+      "published_at": ""
+    },
+    {
+      "id": "https://campus.51job.com/asml2027/#https://www.asml.com/en",
+      "title": "公司官网",
+      "url": "https://campus.51job.com/asml2027/#https://www.asml.com/en",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "campus.51job.com",
+      "published_at": ""
+    }
+  ]
+}
