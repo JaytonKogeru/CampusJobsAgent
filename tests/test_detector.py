@@ -9,5 +9,6 @@ def test_detector():
     assert pick_adapter("https://hr-campus.vivo.com/jobs").name == "vivo-campus"
     assert pick_adapter("https://careers.oppo.com/#/campus").name == "oppo"
     assert pick_adapter("https://join.tplinkglobal.com/jobs").name == "tplink-global"
+    assert pick_adapter("https://kla.wd1.myworkdayjobs.com/Search?q=2027%20Campus").name == "workday"
     assert pick_adapter("https://jobs.ashbyhq.com/openai").name == "ashby"
     assert pick_adapter("https://jobs.lever.co/foo").name == "lever"
