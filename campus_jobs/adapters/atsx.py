@@ -118,6 +118,17 @@ class ATSXAdapter(BaseAdapter):
         query = urlencode([(k, v) for k, vals in q.items() for v in vals])
         return urlunparse((p.scheme, p.netloc, p.path, p.params, query, p.fragment))
 
+    @staticmethod
+    def _page_url(url: str, keyword: str, current: int, limit: int) -> str:
+        p = urlparse(url)
+        q = parse_qs(p.query, keep_blank_values=True)
+        if keyword:
+            q["keywords"] = [keyword]
+        q["current"] = [str(current)]
+        q["limit"] = [str(limit)]
+        query = urlencode([(k, v) for k, vals in q.items() for v in vals])
+        return urlunparse((p.scheme, p.netloc, p.path, p.params, query, p.fragment))
+
     def _crawl_api(self, url: str, options: CrawlOptions) -> CrawlResult:
         p = urlparse(url)
         host = p.hostname or ""
@@ -218,53 +229,64 @@ class ATSXAdapter(BaseAdapter):
                     return
 
             page.on("response", on_response)
-            page.goto(
-                self._url_with_keyword(url, options.keyword),
-                wait_until="domcontentloaded",
-                timeout=int(options.timeout * 1000),
-            )
-            page.wait_for_timeout(min(options.browser_wait_ms, 4000))
 
             for page_index in range(options.max_pages):
                 limit = min(max(options.page_size, 1), 100)
                 body = self._body(url, options, page_index * limit, limit)
-                result = page.evaluate(
-                    """
-                    async ({endpoint, body, headers}) => {
-                      const response = await fetch(endpoint, {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers,
-                        body: JSON.stringify(body),
-                      });
-                      let data = null;
-                      try { data = await response.json(); } catch (_) {}
-                      return {status: response.status, data};
-                    }
-                    """,
-                    {
-                        "endpoint": f"{root}/api/v1/search/job/posts",
-                        "body": body,
-                        "headers": {k: v for k, v in headers.items() if k.lower() != "referer"},
-                    },
-                )
+                result: dict[str, object] = {}
+                try:
+                    result = page.evaluate(
+                        """
+                        async ({endpoint, body, headers}) => {
+                          const response = await fetch(endpoint, {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers,
+                            body: JSON.stringify(body),
+                          });
+                          let data = null;
+                          try { data = await response.json(); } catch (_) {}
+                          return {status: response.status, data};
+                        }
+                        """,
+                        {
+                            "endpoint": f"{root}/api/v1/search/job/posts",
+                            "body": body,
+                            "headers": {k: v for k, v in headers.items() if k.lower() != "referer"},
+                        },
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    warnings.append(f"browser API page {page_index + 1}: {exc}")
+
                 payload = result.get("data") if isinstance(result, dict) else None
                 if not isinstance(payload, dict) or result.get("status") != 200:
-                    # If the explicit call is blocked, use the page's own captured request.
-                    payload = captured_pages[-1] if captured_pages else None
+                    # Some Feishu career portals reject our explicit POST but their
+                    # own page request still works. Navigate to each UI page and
+                    # consume the newly captured job_post_list response so pagination
+                    # and project/category filters are preserved exactly.
+                    captured_before = len(captured_pages)
+                    page.goto(
+                        self._page_url(url, options.keyword, page_index + 1, limit),
+                        wait_until="domcontentloaded",
+                        timeout=int(options.timeout * 1000),
+                    )
+                    page.wait_for_timeout(min(options.browser_wait_ms, 4000))
+                    new_pages = captured_pages[captured_before:]
+                    payload = new_pages[-1] if new_pages else None
+
                 rows = ((payload or {}).get("data") or {}).get("job_post_list") or []
                 if not rows:
                     if jobs:
                         break
                     if page_index == 0:
-                        raise RuntimeError(f"browser ATSX API produced no job_post_list (status={result.get('status')})")
+                        raise RuntimeError(
+                            f"browser ATSX API produced no job_post_list (status={result.get('status')})"
+                        )
                     break
                 for item in rows:
                     job = self._job(item, root, host, options.scope)
                     if job is None or job.id in seen:
                         continue
-                    # Local post-filter is intentionally title/JD based; it avoids
-                    # mistaking filter dictionaries for job objects.
                     if options.keyword and options.keyword.lower() not in job.full_text.lower():
                         continue
                     seen.add(job.id)
