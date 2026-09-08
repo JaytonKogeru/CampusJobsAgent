@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from campus_jobs.http import PublicClient
 from campus_jobs.models import CrawlOptions, CrawlResult, Job
@@ -29,15 +29,28 @@ class WorkdayAdapter(BaseAdapter):
         tenant = (p.hostname or "").split(".")[0]
         return f"{p.scheme}://{p.netloc}", tenant, site
 
+    @staticmethod
+    def _search_text(url: str, keyword: str) -> str:
+        if keyword:
+            return keyword
+        query = parse_qs(urlparse(url).query)
+        return clean_text((query.get("q") or query.get("searchText") or [""])[0])
+
     def crawl(self, url: str, options: CrawlOptions) -> CrawlResult:
         root, tenant, site = self._site(url)
         api = f"{root}/wday/cxs/{tenant}/{site}/jobs"
+        search_text = self._search_text(url, options.keyword)
         jobs: list[Job] = []
         warnings: list[str] = []
         with PublicClient(options.timeout) as client:
             for page in range(options.max_pages):
                 limit = min(max(options.page_size, 1), 20)
-                body = {"appliedFacets": {}, "limit": limit, "offset": page * limit, "searchText": options.keyword}
+                body = {
+                    "appliedFacets": {},
+                    "limit": limit,
+                    "offset": page * limit,
+                    "searchText": search_text,
+                }
                 data = client.post(api, json=body, headers={"Referer": url, "Accept": "application/json"}).json()
                 rows = data.get("jobPostings") or []
                 if not rows:
@@ -48,14 +61,22 @@ class WorkdayAdapter(BaseAdapter):
                     detail = {}
                     if options.include_details and ext:
                         try:
-                            detail = client.get(f"{root}/wday/cxs/{tenant}/{site}{ext}", headers={"Referer": url}).json().get("jobPostingInfo") or {}
+                            detail = client.get(
+                                f"{root}/wday/cxs/{tenant}/{site}{ext}", headers={"Referer": url}
+                            ).json().get("jobPostingInfo") or {}
                         except Exception as exc:  # noqa: BLE001
                             warnings.append(f"detail {ext}: {exc}")
-                    jobs.append(Job(
-                        id=jid, title=clean_text(item.get("title")), url=f"{root}{ext}" if ext else url,
-                        location=clean_text(item.get("locationsText")), description=clean_text(detail.get("jobDescription")),
-                        source="workday", extra={**item, **detail},
-                    ))
+                    jobs.append(
+                        Job(
+                            id=jid,
+                            title=clean_text(item.get("title")),
+                            url=f"{root}{ext}" if ext else url,
+                            location=clean_text(item.get("locationsText")),
+                            description=clean_text(detail.get("jobDescription")),
+                            source="workday",
+                            extra={**item, **detail},
+                        )
+                    )
                     if len(jobs) >= options.max_jobs:
                         break
                 if len(jobs) >= options.max_jobs or len(rows) < limit:
