@@ -1,95 +1,99 @@
 # Crawl result
 
-- Adapter: `atsx->generic-browser`
+- Adapter: `atsx->browser-api`
 - Source: https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI
-- Jobs: **153**
-- Warnings: **1**
+- Jobs: **229**
+- Warnings: **2**
 
 | # | 岗位 | 地点 | 职能/部门 | 链接 |
 |---:|---|---|---|---|
-| 1 | captcha.zip |  |  | [详情](https://lf-rc1.yhgfb-cn-static.com/obj/rc-verifycenter/rmc-captcha/1.0.0.902/captcha.zip) |
-| 2 | 校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=2) |
-| 3 | {'zh_cn': '2027届秋季校园招聘', 'en_us': None, 'i18n': '2027届秋季校园招聘'} |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7657111951542143268) |
-| 4 | {'zh_cn': '日常实习', 'en_us': None, 'i18n': '日常实习'} |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7652669792650037542) |
-| 5 | 技术研发类 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7366092328065714469) |
-| 6 | 算法 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560595163229358377) |
-| 7 | 嵌入式 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560595156153764139) |
-| 8 | 硬件 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560596741722130707) |
-| 9 | 软件 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560596841894299950) |
-| 10 | 测试 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560597090986395945) |
-| 11 | 质量 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560597370850216230) |
-| 12 | 新产品导入 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560597467429374254) |
-| 13 | 产品/运营类 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7366092491991533833) |
-| 14 | 产品 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560597981699950886) |
-| 15 | 运营 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560598037752908071) |
-| 16 | 数据分析 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560598297946442011) |
-| 17 | CMI |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560599072354519346) |
-| 18 | 营销/市场/业务类 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7366092604281669898) |
-| 19 | 销售 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560599820223252746) |
-| 20 | 市场 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560599859284609334) |
-| 21 | 电商 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560600313499191606) |
-| 22 | 用户满意 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560600478968645930) |
-| 23 | 视频/设计类 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7366092756340771098) |
-| 24 | 综合类/职能类 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7366092795788511514) |
-| 25 | 战略 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560600936579369243) |
-| 26 | 财务 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560601096998586675) |
-| 27 | HR |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560601277312157990) |
-| 28 | 法务 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560601113985583402) |
-| 29 | 知识产权 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560601097229814079) |
-| 30 | IT运维 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560601403505330482) |
-| 31 | 信息安全 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560601663272306994) |
-| 32 | 政府事务 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560602112729270582) |
-| 33 | 供应链类 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7366092863739955494) |
-| 34 | 采购 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560602263002761508) |
-| 35 | 计划物控PMC |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560602340404152630) |
-| 36 | 物流 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7560602750100572442) |
-| 37 | {'name': '置顶', 'en_name': '置顶', 'i18n_name': '置顶'} |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7673730692275407113) |
-| 38 | {'name': '校招中文官网仅职位', 'en_name': None, 'i18n_name': '校招中文官网仅职位'} |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7673730692275439881) |
-| 39 | Marketing Trainee（意大利语） -2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7667853804130650378) |
-| 40 | 正式 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=201) |
-| 41 | 宝安区兴业路前海人寿金融中心 | {'city_code': 'CT_128', 'name': '深圳', 'en_name': 'Shenzhen', 'i18n_name': '深圳', 'py_name': 'shenzhen'} |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7374754760665726979) |
-| 42 | 零售运营专员（专卖店方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664517332202621203) |
-| 43 | 零售专员-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664516247107963174) |
-| 44 | 影像软件工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664446037495925035) |
-| 45 | 影像算法工程师--2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663786891687758086) |
-| 46 | 移动端开发工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663454329102485786) |
-| 47 | C++开发工程师（图传方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663409502507403526) |
-| 48 | 无线连接工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663408937623062838) |
-| 49 | 视觉算法工程师（标定方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663406876549630218) |
-| 50 | 视觉算法工程师（防抖方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663406669292030249) |
-| 51 | 嵌入式算法工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663405079612983561) |
-| 52 | C++开发工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663404053859453247) |
-| 53 | AI开发工程师（C++方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7663402599408126246) |
-| 54 | 感知算法工程师（AG）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7657367061060536595) |
-| 55 | 标定算法工程师（AG）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7657367033122392326) |
-| 56 | 嵌入式感知算法工程师（AG）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7657364045402720521) |
-| 57 | 嵌入式算法工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7657129631846451482) |
-| 58 | C++/Java 开发工程师（智能影像系统）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7657129264933079332) |
-| 59 | 包装设计师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7681519388365572358) |
-| 60 | 数字营销管培生（增长营销方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7678640346762316083) |
-| 61 | Data agent全栈开发工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7678174819064318246) |
-| 62 | 屏幕显示工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7678171242865101107) |
-| 63 | 深圳 | {'city_code': 'CT_128', 'name': '深圳', 'en_name': 'Shenzhen', 'i18n_name': '深圳', 'py_name': 'shenzhen'} |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7524153537960034305) |
-| 64 | Marketing Trainee – 中东市场（阿拉伯语）– 2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7677559590825511194) |
-| 65 | Marketing Trainee – 拉美市场（西语/葡语）– 2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7677558695706560818) |
-| 66 | 体验设计师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7673503996564769060) |
-| 67 | 战略分析师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7670812534044592422) |
-| 68 | VR定位算法工程师（AG）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7665937890857486638) |
-| 69 | 软件产品经理（固件方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7665929800230553897) |
-| 70 | 马达工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7665550295406217526) |
-| 71 | 运动营销管培生-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7665197307479296299) |
-| 72 | 影石管培生（CEO培养）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664880597853047076) |
-| 73 | 宝安区兴业路前海人寿金融中心T1栋25楼（地铁11号线宝安站B口/5号线宝华站C口） | {'city_code': 'CT_128', 'name': '深圳', 'en_name': 'Shenzhen', 'i18n_name': '深圳', 'py_name': 'shenzhen'} |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7374743438534836226) |
-| 74 | 海外销售专员（小语种方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664829004498733366) |
-| 75 | 海外销售专员-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664828806776408362) |
-| 76 | 后端开发工程师-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664585856564857151) |
-| 77 | AI应用产品管培生-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664585052421196041) |
-| 78 | AI知识库运营管培生-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664585038919764260) |
-| 79 | PQE管培生-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664584680621525275) |
-| 80 | 服务运营管培生（线下服务运营方向）-2027校招 |  |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/list?keywords=&category=&location=&project=7657111951542143268&type=&job_hot_flag=&current=1&limit=100&functionCategory=&tag=&share_token=MzsxNzg0NzAzNDYxMTAyOzc1MzA1ODM0NDkzMTc4MjA2OTE7MDsxLzI#job=7664584509564668211) |
+| 1 | Marketing Trainee（意大利语） -2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7667853804130650378/detail) |
+| 2 | 零售运营专员（专卖店方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664517332202621203/detail) |
+| 3 | 零售专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664516247107963174/detail) |
+| 4 | 影像软件工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664446037495925035/detail) |
+| 5 | 影像算法工程师--2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663786891687758086/detail) |
+| 6 | 移动端开发工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663454329102485786/detail) |
+| 7 | C++开发工程师（图传方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663409502507403526/detail) |
+| 8 | 无线连接工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663408937623062838/detail) |
+| 9 | 视觉算法工程师（标定方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663406876549630218/detail) |
+| 10 | 视觉算法工程师（防抖方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663406669292030249/detail) |
+| 11 | 嵌入式算法工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663405079612983561/detail) |
+| 12 | C++开发工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663404053859453247/detail) |
+| 13 | AI开发工程师（C++方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7663402599408126246/detail) |
+| 14 | 感知算法工程师（AG）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7657367061060536595/detail) |
+| 15 | 标定算法工程师（AG）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7657367033122392326/detail) |
+| 16 | 嵌入式感知算法工程师（AG）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7657364045402720521/detail) |
+| 17 | 嵌入式算法工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7657129631846451482/detail) |
+| 18 | C++/Java 开发工程师（智能影像系统）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7657129264933079332/detail) |
+| 19 | 包装设计师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7681519388365572358/detail) |
+| 20 | 数字营销管培生（增长营销方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7678640346762316083/detail) |
+| 21 | Data agent全栈开发工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7678174819064318246/detail) |
+| 22 | 屏幕显示工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7678171242865101107/detail) |
+| 23 | Marketing Trainee – 中东市场（阿拉伯语）– 2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7677559590825511194/detail) |
+| 24 | Marketing Trainee – 拉美市场（西语/葡语）– 2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7677558695706560818/detail) |
+| 25 | 体验设计师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7673503996564769060/detail) |
+| 26 | 战略分析师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7670812534044592422/detail) |
+| 27 | VR定位算法工程师（AG）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7665937890857486638/detail) |
+| 28 | 软件产品经理（固件方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7665929800230553897/detail) |
+| 29 | 马达工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7665550295406217526/detail) |
+| 30 | 运动营销管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7665197307479296299/detail) |
+| 31 | 影石管培生（CEO培养）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664880597853047076/detail) |
+| 32 | 海外销售专员（小语种方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664829004498733366/detail) |
+| 33 | 海外销售专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664828806776408362/detail) |
+| 34 | 后端开发工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664585856564857151/detail) |
+| 35 | AI应用产品管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664585052421196041/detail) |
+| 36 | AI知识库运营管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664585038919764260/detail) |
+| 37 | PQE管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664584680621525275/detail) |
+| 38 | 服务运营管培生（线下服务运营方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664584509564668211/detail) |
+| 39 | 备件运营管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664584322438973739/detail) |
+| 40 | 后端开发工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664583792913680694/detail) |
+| 41 | 社媒服务管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664582679136323894/detail) |
+| 42 | 服务运营管培生（无人机方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664581707069638918/detail) |
+| 43 | 社媒运营管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664580718643448091/detail) |
+| 44 | 服务运营管培生（服务运营方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664580301998229786/detail) |
+| 45 | 全球用户运营管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664575595946625322/detail) |
+| 46 | 嵌入式工程师（应用方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664571563241605414/detail) |
+| 47 | 资金管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664553654930458923/detail) |
+| 48 | 财务管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664532938230384946/detail) |
+| 49 | 税务管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664529892676290822/detail) |
+| 50 | 应收管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664529672709654835/detail) |
+| 51 | 法务管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664529507722119434/detail) |
+| 52 | 证券事务专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664528378552879402/detail) |
+| 53 | 销售专员（无人机品线）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664527180533418290/detail) |
+| 54 | GTM管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664525516876597542/detail) |
+| 55 | 专卖店建店专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664519698515642675/detail) |
+| 56 | 产品培训管培生（海外）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664519244365728043/detail) |
+| 57 | 渠道营销专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664518598840568127/detail) |
+| 58 | 商务专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664518557363079478/detail) |
+| 59 | 展陈项目专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664518535314016522/detail) |
+| 60 | 销售管理专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664517932558895414/detail) |
+| 61 | 国内行业销售专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664517617139058985/detail) |
+| 62 | 渠道销售专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664517391170423090/detail) |
+| 63 | 零售运营专员（零售BP）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664516499214469430/detail) |
+| 64 | 后端工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664510511132215594/detail) |
+| 65 | 系统运维工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664509710175553802/detail) |
+| 66 | 产品经理-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664508546910865706/detail) |
+| 67 | 服务器运维工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664508492543691050/detail) |
+| 68 | 桌面运维工程师-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664507895471884570/detail) |
+| 69 | 公关管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664507498182986026/detail) |
+| 70 | Marketing Trainee (Brand Strategy)-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664507091461146934/detail) |
+| 71 | 海外公关专员-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664506693116692774/detail) |
+| 72 | Marketing Trainee-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664505998539507987/detail) |
+| 73 | 数字营销管培生（Social方向）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664498828066064649/detail) |
+| 74 | Marketing Trainee（德语）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664492865292962102/detail) |
+| 75 | Marketing Trainee（亚太）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664492772166027571/detail) |
+| 76 | Marketing Trainee（北美）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664492676402432262/detail) |
+| 77 | 市场管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664491297285540150/detail) |
+| 78 | 市场营销岗（海外高校）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664460256151996726/detail) |
+| 79 | 市场营销岗（KOC）-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664459686666979634/detail) |
+| 80 | 海外用户运营管培生-2027校招 | 深圳 |  | [详情](https://arashivision.jobs.feishu.cn/campus/position/7664459582538402094/detail) |
 
 > 仅展示前 80 个岗位，完整 JD 请查看 JSON。
 
 ## Warnings
-- ATSX direct/browser API failed; generic browser used: direct=HTTPStatusError: Client error '405 Method Not Allowed' for url 'https://arashivision.jobs.feishu.cn/api/v1/search/job/posts'
-For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405; browser=RuntimeError: browser ATSX API produced no job_post_list (status=405)
+- ATSX direct API failed; browser-context API used: HTTPStatusError: Client error '405 Method Not Allowed' for url 'https://arashivision.jobs.feishu.cn/api/v1/search/job/posts'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405
+- browser API page 1: Page.evaluate: TypeError: Failed to fetch
+    at eval (eval at evaluate (:311:30), <anonymous>:2:50)
+    at UtilityScript.evaluate (<anonymous>:318:18)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
