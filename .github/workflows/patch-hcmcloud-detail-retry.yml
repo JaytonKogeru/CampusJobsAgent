@@ -1,0 +1,234 @@
+name: One-shot HCMCloud detail retry patch
+
+on:
+  push:
+    branches:
+      - fix/hcmcloud-detail-retry
+    paths:
+      - .github/workflows/patch-hcmcloud-detail-retry.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/hcmcloud-detail-retry
+
+      - name: Patch detail retry and department normalization
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from textwrap import dedent, indent
+
+          path = Path('campus_jobs/adapters/hcmcloud.py')
+          text = path.read_text(encoding='utf-8')
+
+          hydrate_marker = '    def _hydrate_details(\n'
+          assert text.count(hydrate_marker) == 1
+          helper_body = dedent('''
+          def _apply_detail_payload(self, job: Job, payload: dict[str, object]) -> None:
+              detail_id = clean_text(payload.get("job_id"))
+              if detail_id and detail_id != job.id:
+                  raise RuntimeError(f"detail id mismatch: {detail_id}")
+              description = clean_text(payload.get("job_desc"))
+              if len(description) <= 20:
+                  raise RuntimeError("detail description was empty or too short")
+
+              professional = clean_text(payload.get("professional"))
+              education = clean_text(job.extra.get("education"))
+              job.description = description
+              job.requirements = self._requirements_from_detail(
+                  description,
+                  education,
+                  professional,
+              )
+              department = clean_text(payload.get("department"))
+              if department and not department.isdigit() and not job.department:
+                  job.department = department
+              job.extra.update(
+                  {
+                      "detail_hydrated": True,
+                      "professional": professional,
+                      "recruit_number": clean_text(payload.get("recruit_number")),
+                      "work_exp": clean_text(payload.get("work_exp")),
+                      "work_address": clean_text(payload.get("work_address")),
+                      "detail_background": clean_text(payload.get("background")),
+                      "detail_department": department,
+                  }
+              )
+          ''').strip('\n')
+          text = text.replace(hydrate_marker, indent(helper_body, '    ') + '\n\n' + hydrate_marker, 1)
+
+          old_payload = '''                            payload = worker.evaluate(_DETAIL_EXTRACT_JS)
+                            if not isinstance(payload, dict):
+                                raise RuntimeError("detail extractor returned no object")
+                            detail_id = clean_text(payload.get("job_id"))
+                            if detail_id and detail_id != job.id:
+                                raise RuntimeError(f"detail id mismatch: {detail_id}")
+                            description = clean_text(payload.get("job_desc"))
+                            if len(description) <= 20:
+                                raise RuntimeError("detail description was empty or too short")
+
+                            professional = clean_text(payload.get("professional"))
+                            education = clean_text(job.extra.get("education"))
+                            job.description = description
+                            job.requirements = self._requirements_from_detail(
+                                description,
+                                education,
+                                professional,
+                            )
+                            department = clean_text(payload.get("department"))
+                            if department and not job.department:
+                                job.department = department
+                            job.extra.update(
+                                {
+                                    "detail_hydrated": True,
+                                    "professional": professional,
+                                    "recruit_number": clean_text(payload.get("recruit_number")),
+                                    "work_exp": clean_text(payload.get("work_exp")),
+                                    "work_address": clean_text(payload.get("work_address")),
+                                    "detail_background": clean_text(payload.get("background")),
+                                }
+                            )
+'''
+          new_payload = '''                            payload = worker.evaluate(_DETAIL_EXTRACT_JS)
+                            if not isinstance(payload, dict):
+                                raise RuntimeError("detail extractor returned no object")
+                            self._apply_detail_payload(job, payload)
+'''
+          assert text.count(old_payload) == 1, f'payload block count={text.count(old_payload)}'
+          text = text.replace(old_payload, new_payload, 1)
+
+          assert text.count('        failures: list[str] = []\n') == 1
+          text = text.replace(
+              '        failures: list[str] = []\n',
+              '        failures: list[tuple[Job, str]] = []\n',
+              1,
+          )
+          assert text.count('                    failures.append(f"{job.id}:{error[:180]}")\n') == 1
+          text = text.replace(
+              '                    failures.append(f"{job.id}:{error[:180]}")\n',
+              '                    failures.append((job, error[:180]))\n',
+              1,
+          )
+
+          retry_anchor = '''                    aborted = True
+                    break
+        finally:
+'''
+          assert text.count(retry_anchor) == 1, f'retry anchor count={text.count(retry_anchor)}'
+          retry_block = '''                    aborted = True
+                    break
+
+            # A small number of HCMCloud detail requests can exceed the normal
+            # timeout transiently. Retry only the failed jobs once, with a
+            # wider timeout, after the main parallel pass has completed.
+            if failures and not aborted:
+                retry_pending = list(failures)
+                failures = []
+                retry_timeout_ms = min(detail_timeout_ms * 2, 15000)
+                for start in range(0, len(retry_pending), len(workers)):
+                    batch = retry_pending[start : start + len(workers)]
+                    assignments = []
+                    for worker, (job, first_error) in zip(workers, batch, strict=False):
+                        error = ""
+                        try:
+                            fragment = urlparse(job.url).fragment
+                            worker.evaluate(
+                                "fragment => { window.location.hash = '#' + fragment; }",
+                                fragment,
+                            )
+                        except Exception as exc:  # noqa: BLE001
+                            error = f"navigate {type(exc).__name__}: {exc}"
+                        assignments.append((worker, job, first_error, error))
+
+                    for worker, job, first_error, error in assignments:
+                        if not error:
+                            try:
+                                worker.wait_for_function(
+                                    _DETAIL_READY_JS,
+                                    arg=job.id,
+                                    timeout=retry_timeout_ms,
+                                )
+                                payload = worker.evaluate(_DETAIL_EXTRACT_JS)
+                                if not isinstance(payload, dict):
+                                    raise RuntimeError("detail extractor returned no object")
+                                self._apply_detail_payload(job, payload)
+                                job.extra["detail_retry_count"] = 1
+                                hydrated += 1
+                                continue
+                            except Exception as exc:  # noqa: BLE001
+                                error = f"{type(exc).__name__}: {exc}"
+
+                        failures.append(
+                            (job, f"{first_error} | retry {error[:160]}")
+                        )
+        finally:
+'''
+          text = text.replace(retry_anchor, retry_block, 1)
+
+          old_sample = '            sample = "; ".join(failures[:5]) or "unattempted after abort"\n'
+          new_sample = '''            sample = (
+                "; ".join(f"{job.id}:{error}" for job, error in failures[:5])
+                or "unattempted after abort"
+            )
+'''
+          assert text.count(old_sample) == 1, f'sample block count={text.count(old_sample)}'
+          text = text.replace(old_sample, new_sample, 1)
+          path.write_text(text, encoding='utf-8')
+
+          tests = Path('tests/test_hcmcloud.py')
+          test_text = tests.read_text(encoding='utf-8')
+          if 'def test_detail_payload_does_not_expose_numeric_department_id()' not in test_text:
+              test_text += dedent('''
+
+              def test_detail_payload_does_not_expose_numeric_department_id():
+                  job = Job(
+                      id="59959",
+                      title="软件研发工程师",
+                      url="https://inspur.hcmcloud.cn/recruit#/portal_job_detail?id=x",
+                      requirements="本科及以上",
+                      extra={"education": "本科及以上"},
+                  )
+                  HCMCloudAdapter()._apply_detail_payload(
+                      job,
+                      {
+                          "job_id": "59959",
+                          "job_desc": "岗位职责：负责研发。\\n任职要求：本科及以上学历，计算机相关专业。",
+                          "department": "15130789",
+                          "professional": "计算机相关专业",
+                      },
+                  )
+                  assert job.department == ""
+                  assert job.extra["detail_department"] == "15130789"
+                  assert job.description.startswith("岗位职责")
+                  assert "任职要求" in job.requirements
+              ''')
+              if 'from campus_jobs.models import Job' not in test_text:
+                  test_text = test_text.replace(
+                      'from campus_jobs.adapters.hcmcloud import HCMCloudAdapter\n',
+                      'from campus_jobs.adapters.hcmcloud import HCMCloudAdapter\nfrom campus_jobs.models import Job\n',
+                      1,
+                  )
+          tests.write_text(test_text, encoding='utf-8')
+          PY
+
+          python -m compileall -q campus_jobs tests
+          python -m pip install -U pip
+          pip install -e '.[dev]'
+          pytest tests/test_hcmcloud.py tests/test_generic_browser.py tests/test_detector.py
+          ruff check --select E4,E7,E9,F campus_jobs tests
+          git diff --check
+
+      - name: Commit code and tests only
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add campus_jobs/adapters/hcmcloud.py tests/test_hcmcloud.py
+          git commit -m 'hcmcloud: retry transient detail hydration failures'
+          git push origin HEAD:fix/hcmcloud-detail-retry
