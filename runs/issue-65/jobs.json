@@ -1,0 +1,50 @@
+{
+  "adapter": "generic-browser",
+  "source_url": "https://maker.haier.net/client/campus/activityindex.html",
+  "count": 3,
+  "warnings": [],
+  "jobs": [
+    {
+      "id": "https://maker.haier.net/client/campus/activityindex.html",
+      "title": "岗位投递",
+      "url": "https://maker.haier.net/client/campus/activityindex.html",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "maker.haier.net",
+      "published_at": ""
+    },
+    {
+      "id": "https://maker.haier.net/client/campus/dynamic.html",
+      "title": "招聘动态",
+      "url": "https://maker.haier.net/client/campus/dynamic.html",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "maker.haier.net",
+      "published_at": ""
+    },
+    {
+      "id": "https://maker.haier.net/client/practice/jobs.html",
+      "title": "实习生招聘",
+      "url": "https://maker.haier.net/client/practice/jobs.html",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "maker.haier.net",
+      "published_at": ""
+    }
+  ]
+}
