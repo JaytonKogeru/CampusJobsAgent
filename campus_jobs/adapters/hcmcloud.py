@@ -18,6 +18,55 @@ _DOM_EXTRACT_JS = r"""
     const rect = el.getBoundingClientRect();
     return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 2 && rect.height > 2;
   };
+  const attrMap = (node, prefix='') => {
+    const attrs = {};
+    if (!node) return attrs;
+    for (const attr of node.attributes || []) {
+      if (attr.name === 'id' || attr.name.startsWith('data-')) attrs[`${prefix}${attr.name}`] = attr.value;
+    }
+    return attrs;
+  };
+  const badTitle = /^(首页|职位|职位列表|岗位|岗位列表|招聘职位|校园招聘|社会招聘|实习招聘|搜索|筛选|下一页|上一页|职位名称)$/;
+  const out = [];
+  const seenNodes = new Set();
+
+  // HCMCloud tenants commonly render jobs as a table. Require job-like headers
+  // instead of accepting every table on the page.
+  for (const table of document.querySelectorAll('table')) {
+    if (!visible(table)) continue;
+    const headers = [...table.querySelectorAll('thead th, thead [role="columnheader"]')]
+      .map((el) => (el.innerText || '').trim()).filter(Boolean);
+    const headerText = headers.join('|');
+    const jobTable = headerText.includes('职位名称') &&
+      (headerText.includes('所属单位') || headerText.includes('工作城市') || headerText.includes('发布时间'));
+    if (!jobTable) continue;
+
+    for (const node of table.querySelectorAll('tbody tr, [role="row"]')) {
+      if (!visible(node)) continue;
+      const cells = [...node.querySelectorAll(':scope > td, :scope > [role="cell"]')]
+        .map((el) => (el.innerText || '').replace(/\u00a0/g, ' ').trim());
+      if (cells.length < 5) continue;
+      const title = (cells[0] || '').trim();
+      if (title.length < 2 || title.length > 120 || badTitle.test(title)) continue;
+      const raw = cells.filter(Boolean).join('\n');
+      const anchor = node.querySelector('a[href]');
+      const href = anchor ? (anchor.getAttribute('href') || '') : '';
+      out.push({
+        title,
+        href,
+        text: raw,
+        lines: cells.filter(Boolean),
+        cells,
+        headers,
+        className: String(node.className || ''),
+        attrs: {...attrMap(node), ...attrMap(anchor, 'a:')},
+        kind: 'table-row'
+      });
+      seenNodes.add(node);
+    }
+  }
+
+  // Family fallback for HCMCloud tenants that use cards/lists instead of tables.
   const selectors = [
     'a[href*="portal_job"]',
     'a[href*="job_id"]',
@@ -35,10 +84,8 @@ _DOM_EXTRACT_JS = r"""
     '[class*="portal_job"] [class*="item"]'
   ];
   const nodes = [...new Set(selectors.flatMap((s) => [...document.querySelectorAll(s)]))];
-  const badTitle = /^(首页|职位|职位列表|岗位|岗位列表|招聘职位|校园招聘|社会招聘|实习招聘|搜索|筛选|下一页|上一页)$/;
-  const out = [];
   for (const node of nodes) {
-    if (!visible(node)) continue;
+    if (seenNodes.has(node) || !visible(node)) continue;
     const raw = (node.innerText || '').replace(/\u00a0/g, ' ').trim();
     if (!raw || raw.length > 2000) continue;
     const lines = raw.split(/\n+/).map((x) => x.trim()).filter(Boolean);
@@ -55,27 +102,68 @@ _DOM_EXTRACT_JS = r"""
     const className = String(node.className || '');
     const signal = `${className} ${href}`.toLowerCase();
     if (!/(job|position|portal_job|recruit)/.test(signal)) continue;
-
-    const attrs = {};
-    for (const attr of node.attributes || []) {
-      if (attr.name === 'id' || attr.name.startsWith('data-')) attrs[attr.name] = attr.value;
-    }
-    if (anchor && anchor !== node) {
-      for (const attr of anchor.attributes || []) {
-        if (attr.name === 'id' || attr.name.startsWith('data-')) attrs[`a:${attr.name}`] = attr.value;
-      }
-    }
-    out.push({title, href, text: raw, lines, className, attrs});
+    out.push({
+      title,
+      href,
+      text: raw,
+      lines,
+      className,
+      attrs: {...attrMap(node), ...attrMap(anchor, 'a:')},
+      kind: 'card'
+    });
   }
   return out.slice(0, 1000);
 }
 """
 
 
+_PAGINATION_DEBUG_JS = r"""
+() => {
+  const visible = (el) => {
+    const style = window.getComputedStyle(el);
+    const rect = el.getBoundingClientRect();
+    return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 2 && rect.height > 2;
+  };
+  const result = [];
+  for (const el of document.querySelectorAll('button,a,input,[role="button"]')) {
+    if (!visible(el)) continue;
+    let parent = el;
+    let context = '';
+    for (let i = 0; i < 5 && parent; i++, parent = parent.parentElement) {
+      const text = (parent.innerText || '').replace(/\s+/g, ' ').trim();
+      const cls = String(parent.className || '');
+      if (/page|pager|pagination/i.test(cls) || (text.includes('页') && (text.includes('当前第') || text.includes('条/页')))) {
+        context = `${cls} :: ${text}`;
+        break;
+      }
+    }
+    if (!context) continue;
+    result.push({
+      tag: el.tagName,
+      cls: String(el.className || ''),
+      text: (el.innerText || '').trim(),
+      title: el.getAttribute('title') || '',
+      aria: el.getAttribute('aria-label') || '',
+      disabled: Boolean(el.disabled) || el.getAttribute('aria-disabled') === 'true',
+      value: 'value' in el ? String(el.value || '') : '',
+      context: context.slice(0, 500)
+    });
+  }
+  return result.slice(0, 40);
+}
+"""
+
+
 _TOTAL_PATTERNS = (
+    re.compile(r"(?:新的机会|机会)\s*[\(（]\s*(\d+)\s*[\)）]"),
     re.compile(r"共\s*(\d+)\s*(?:个|条|项)\s*(?:职位|岗位)?"),
     re.compile(r"(?:职位|岗位)\s*(?:共|总计|合计)?\s*(\d+)\s*(?:个|条|项)?"),
     re.compile(r"(\d+)\s*(?:个|条)\s*(?:职位|岗位)"),
+)
+
+_PAGE_PATTERNS = (
+    re.compile(r"/\s*(\d+)\s*页"),
+    re.compile(r"共\s*(\d+)\s*页"),
 )
 
 _ID_PATTERNS = (
@@ -89,8 +177,8 @@ class HCMCloudAdapter(BaseAdapter):
 
     HCMCloud wraps recruiting API payloads in its transfer layer, so this adapter
     deliberately lets the official frontend perform decoding and then extracts the
-    rendered job list. Pagination is guarded by page signatures and terminal-state
-    checks so a silent first-page-only crawl is surfaced as an integrity warning.
+    rendered job list. Pagination is guarded by upstream totals, page signatures,
+    and content-change checks so a silent first-page-only crawl is never trusted.
     """
 
     name = "hcmcloud"
@@ -111,6 +199,19 @@ class HCMCloudAdapter(BaseAdapter):
                 except (TypeError, ValueError):
                     continue
                 if 0 <= value <= 100000:
+                    return value
+        return None
+
+    @staticmethod
+    def _expected_pages(text: str) -> int | None:
+        for pattern in _PAGE_PATTERNS:
+            match = pattern.search(text or "")
+            if match:
+                try:
+                    value = int(match.group(1))
+                except (TypeError, ValueError):
+                    continue
+                if 1 <= value <= 10000:
                     return value
         return None
 
@@ -158,7 +259,38 @@ class HCMCloudAdapter(BaseAdapter):
         return [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
 
     @staticmethod
-    def _next_control(page):
+    def _pagination_debug(page) -> str:
+        try:
+            items = page.evaluate(_PAGINATION_DEBUG_JS)
+        except Exception:
+            return ""
+        if not isinstance(items, list) or not items:
+            return ""
+        parts = []
+        for item in items[:20]:
+            if not isinstance(item, dict):
+                continue
+            parts.append(
+                "tag={tag} cls={cls!r} text={text!r} title={title!r} aria={aria!r} "
+                "disabled={disabled} value={value!r} context={context!r}".format(**item)
+            )
+        return "\n".join(parts)
+
+    @staticmethod
+    def _is_enabled(item) -> bool:
+        try:
+            if not item.is_visible():
+                return False
+            if item.is_disabled():
+                return False
+            if (item.get_attribute("aria-disabled") or "").lower() == "true":
+                return False
+            return "disabled" not in (item.get_attribute("class") or "").lower()
+        except Exception:
+            return False
+
+    @classmethod
+    def _advance_page(cls, page, next_page_number: int) -> tuple[bool, str]:
         selectors = (
             ".el-pagination .btn-next",
             ".el-pager + .btn-next",
@@ -166,50 +298,119 @@ class HCMCloudAdapter(BaseAdapter):
             "button[aria-label='Next']",
             "a[aria-label='下一页']",
             "a[aria-label='Next']",
+            "button[class*='next']",
+            "a[class*='next']",
+            "[class*='pagination'] [class*='next']",
+            "[class*='pager'] [class*='next']",
+            "[class*='page'] [class*='next']",
         )
-        saw_disabled = False
         for selector in selectors:
             try:
                 locator = page.locator(selector)
-                count = min(locator.count(), 10)
+                count = min(locator.count(), 12)
             except Exception:
                 continue
             for index in range(count):
                 item = locator.nth(index)
+                if not cls._is_enabled(item):
+                    continue
                 try:
-                    if not item.is_visible():
-                        continue
-                    disabled = item.is_disabled()
-                    aria_disabled = (item.get_attribute("aria-disabled") or "").lower() == "true"
-                    classes = (item.get_attribute("class") or "").lower()
-                    disabled = disabled or aria_disabled or "disabled" in classes
-                    if disabled:
-                        saw_disabled = True
-                        continue
-                    return item, False
+                    item.click(timeout=2500, force=True)
+                    return True, f"click:{selector}"
                 except Exception:
                     continue
 
-        for text in ("下一页", "下页", "Next"):
+        for text in ("下一页", "下页", "Next", ">", "›", "»"):
             try:
                 locator = page.get_by_text(text, exact=True)
-                count = min(locator.count(), 10)
+                count = min(locator.count(), 12)
             except Exception:
                 continue
             for index in range(count):
                 item = locator.nth(index)
+                if not cls._is_enabled(item):
+                    continue
                 try:
-                    if not item.is_visible():
-                        continue
-                    classes = (item.get_attribute("class") or "").lower()
-                    aria_disabled = (item.get_attribute("aria-disabled") or "").lower() == "true"
-                    if aria_disabled or "disabled" in classes:
-                        saw_disabled = True
-                        continue
-                    return item, False
+                    item.click(timeout=2500, force=True)
+                    return True, f"text:{text}"
                 except Exception:
                     continue
-        return None, saw_disabled
+
+        # Inspur's current HCMCloud pager renders the current-page control as an
+        # input between "当前第" and "/ N 页". Filling it is more robust than
+        # depending on tenant-specific icon class names.
+        try:
+            inputs = page.locator("input")
+            count = min(inputs.count(), 30)
+        except Exception:
+            count = 0
+            inputs = None
+        for index in range(count):
+            item = inputs.nth(index)
+            try:
+                if not item.is_visible() or item.is_disabled():
+                    continue
+                ancestor = item
+                context = ""
+                for _ in range(5):
+                    ancestor = ancestor.locator("xpath=..")
+                    context = clean_text(ancestor.inner_text())
+                    if "页" in context and ("当前第" in context or "条/页" in context):
+                        break
+                if "页" not in context or ("当前第" not in context and "条/页" not in context):
+                    continue
+                item.fill(str(next_page_number))
+                item.press("Enter")
+                return True, "page-input"
+            except Exception:
+                continue
+
+        # Last-resort custom pager handling: only inspect compact containers that
+        # clearly identify themselves as pagination. Never click arbitrary page buttons.
+        for selector in ("[class*='pagination']", "[class*='pager']", "[class*='page']"):
+            try:
+                containers = page.locator(selector)
+                container_count = min(containers.count(), 30)
+            except Exception:
+                continue
+            for container_index in range(container_count):
+                container = containers.nth(container_index)
+                try:
+                    if not container.is_visible():
+                        continue
+                    context = clean_text(container.inner_text())
+                    if len(context) > 250 or "页" not in context:
+                        continue
+                    controls = container.locator("button,a,[role='button']")
+                    control_count = min(controls.count(), 20)
+                except Exception:
+                    continue
+                enabled = [controls.nth(i) for i in range(control_count) if cls._is_enabled(controls.nth(i))]
+                if not enabled:
+                    continue
+                signaled = []
+                for item in enabled:
+                    try:
+                        signal = " ".join(
+                            [
+                                item.inner_text(),
+                                item.get_attribute("class") or "",
+                                item.get_attribute("title") or "",
+                                item.get_attribute("aria-label") or "",
+                            ]
+                        ).lower()
+                    except Exception:
+                        continue
+                    if any(token in signal for token in ("next", "right", "下一", ">", "›", "»")):
+                        signaled.append(item)
+                candidates = signaled or [enabled[-1]]
+                for item in candidates:
+                    try:
+                        item.click(timeout=2500, force=True)
+                        return True, f"container:{selector}"
+                    except Exception:
+                        continue
+        return False, "not-found"
 
     @staticmethod
     def _job_url(source_url: str, row: dict[str, object], job_id: str) -> str:
@@ -242,6 +443,13 @@ class HCMCloudAdapter(BaseAdapter):
             digest = hashlib.sha1(f"{title}\n{text}".encode("utf-8", errors="ignore")).hexdigest()[:16]
             job_id = f"dom-{digest}"
 
+        cells = row.get("cells") if isinstance(row.get("cells"), list) else []
+        unit = clean_text(cells[1]) if len(cells) > 1 else ""
+        location = clean_text(cells[2]) if len(cells) > 2 else ""
+        education = clean_text(cells[3]) if len(cells) > 3 else ""
+        published_at = clean_text(cells[4]) if len(cells) > 4 else ""
+        function = clean_text(cells[5]) if len(cells) > 5 else ""
+
         recruit_type = {
             "campus": "校招",
             "intern": "实习",
@@ -252,11 +460,16 @@ class HCMCloudAdapter(BaseAdapter):
             id=job_id,
             title=title,
             url=self._job_url(source_url, row, job_id),
-            company=company,
+            company=unit or company,
+            location=location,
+            function=function,
             recruit_type=recruit_type,
             source=urlparse(source_url).netloc,
+            published_at=published_at,
             extra={
                 "list_text": text,
+                "education": education,
+                "dom_kind": clean_text(row.get("kind")),
                 "dom_class": clean_text(row.get("className")),
                 "dom_attrs": row.get("attrs") if isinstance(row.get("attrs"), dict) else {},
             },
@@ -275,8 +488,11 @@ class HCMCloudAdapter(BaseAdapter):
         endpoint_trace: list[str] = []
         company_state = {"name": ""}
         expected_total: int | None = None
+        expected_pages: int | None = None
         pagination_reason = "unknown"
+        pagination_method = ""
         pages_seen = 0
+        pager_debug = ""
 
         with sync_playwright() as p:
             browser = p.chromium.launch(**chromium_launch_kwargs())
@@ -339,6 +555,9 @@ class HCMCloudAdapter(BaseAdapter):
                 total = self._expected_total(body_text)
                 if total is not None:
                     expected_total = max(expected_total or 0, total)
+                page_total = self._expected_pages(body_text)
+                if page_total is not None:
+                    expected_pages = max(expected_pages or 0, page_total)
 
                 new_jobs = 0
                 for row in rows:
@@ -356,21 +575,23 @@ class HCMCloudAdapter(BaseAdapter):
                 if len(jobs) >= options.max_jobs:
                     break
 
-                next_control, terminal = self._next_control(page)
-                if next_control is None:
-                    pagination_reason = "terminal" if terminal else "no-next-control"
+                if expected_total is not None and len(jobs) >= expected_total:
+                    pagination_reason = "upstream-total"
+                    break
+                if expected_pages is not None and page_index + 1 >= expected_pages:
+                    pagination_reason = "terminal"
                     break
 
                 before_signature = signature
-                try:
-                    next_control.click(timeout=2500, force=True)
-                except Exception as exc:  # noqa: BLE001
-                    warnings.append(f"pagination click failed on page {page_index + 1}: {type(exc).__name__}: {exc}")
-                    pagination_reason = "click-failed"
+                advanced, method = self._advance_page(page, page_index + 2)
+                if not advanced:
+                    pagination_reason = "no-next-control"
+                    pager_debug = self._pagination_debug(page)
                     break
+                pagination_method = method
 
                 changed = False
-                for _ in range(18):
+                for _ in range(20):
                     page.wait_for_timeout(300)
                     dismiss_dynamic_overlays(page, max_rounds=1)
                     next_rows = self._extract_rows(page)
@@ -379,8 +600,11 @@ class HCMCloudAdapter(BaseAdapter):
                         changed = True
                         break
                 if not changed:
-                    warnings.append(f"pagination stalled after page {page_index + 1}; content did not change")
+                    warnings.append(
+                        f"pagination stalled after page {page_index + 1}; content did not change; method={method}"
+                    )
                     pagination_reason = "stalled"
+                    pager_debug = self._pagination_debug(page)
                     break
                 if new_jobs == 0 and page_index > 0:
                     warnings.append(f"page {page_index + 1} added no unique jobs")
@@ -408,13 +632,17 @@ class HCMCloudAdapter(BaseAdapter):
             if len(values) < target:
                 warnings.append(
                     f"integrity incomplete: collected {len(values)}/{target} jobs "
-                    f"(upstream total={expected_total}, reason={pagination_reason}, pages={pages_seen})"
+                    f"(upstream total={expected_total}, expected_pages={expected_pages}, "
+                    f"reason={pagination_reason}, method={pagination_method or '-'}, pages={pages_seen})"
                 )
-        elif pagination_reason in {"stalled", "click-failed", "repeated-page", "max-pages"}:
+        elif pagination_reason in {"stalled", "no-next-control", "repeated-page", "max-pages"}:
             warnings.append(
                 f"integrity unverified: pagination ended with reason={pagination_reason}, "
                 f"jobs={len(values)}, pages={pages_seen}"
             )
+
+        if pager_debug:
+            warnings.append("HCMCloud pager controls:\n" + pager_debug)
 
         if not values:
             warnings.append(
