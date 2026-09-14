@@ -28,6 +28,7 @@ _TOTAL_PATTERNS = (
     re.compile(r"共\s*(\d{1,6})\s*(?:个|条|项)?\s*(?:职位|岗位|招聘职位)"),
     re.compile(r"(?:职位|岗位)\s*共\s*(\d{1,6})\s*(?:个|条|项)?"),
     re.compile(r"新的机会\s*[（(]\s*(\d{1,6})\s*[)）]"),
+    re.compile(r"共计\s*(\d{1,6})\s*(?:个|条|项)?"),
     re.compile(r"共\s*(\d{1,6})\s*(?:个|条|项)"),
 )
 
@@ -213,8 +214,9 @@ class HCMCloudAdapter(BaseAdapter):
                   };
                   const disabled = (el) =>
                     el.disabled || el.getAttribute('aria-disabled') === 'true'
-                    || /(^|\s)(disabled|is-disabled|ivu-page-disabled|ant-pagination-disabled)(\s|$)/.test(el.className || '');
+                    || /(^|\s)(disable|disabled|is-disabled|ivu-page-disabled|ant-pagination-disabled)(\s|$)/.test(el.className || '');
                   const selectors = [
+                    `.hc-paging [ng-click*="onPagingClick('next')"]`,
                     '.el-pagination .btn-next',
                     'button.btn-next',
                     '.ant-pagination-next button',
@@ -337,6 +339,9 @@ class HCMCloudAdapter(BaseAdapter):
                         if item.get("id") or item.get("href")
                     )
                 )
+                first_row_key = ""
+                if candidates:
+                    first_row_key = clean_text(candidates[0].get("id")) or clean_text(candidates[0].get("href"))
                 if signature and signature in page_signatures:
                     warnings.append(f"pagination stopped on repeated page signature at page {page_no}")
                     exhausted = True
@@ -344,7 +349,6 @@ class HCMCloudAdapter(BaseAdapter):
                 if signature:
                     page_signatures.add(signature)
 
-                before = len(jobs)
                 for candidate in candidates:
                     job = self._candidate_to_job(candidate, page.url, host)
                     if job is None:
@@ -381,17 +385,18 @@ class HCMCloudAdapter(BaseAdapter):
                     break
                 pagination_used = True
                 page.wait_for_timeout(700)
-                try:
-                    page.wait_for_function(
-                        """(previous) => {
-                          const row = document.querySelector('.table-row[hcm-key]');
-                          return row && row.getAttribute('hcm-key') !== previous;
-                        }""",
-                        signature[0] if signature else "",
-                        timeout=3000,
-                    )
-                except Exception:
-                    pass
+                if first_row_key:
+                    try:
+                        page.wait_for_function(
+                            """(previous) => {
+                              const row = document.querySelector('.table-row[hcm-key]');
+                              return row && row.getAttribute('hcm-key') !== previous;
+                            }""",
+                            first_row_key,
+                            timeout=3000,
+                        )
+                    except Exception:
+                        pass
 
             if not jobs:
                 sample = self._body_sample(page)
