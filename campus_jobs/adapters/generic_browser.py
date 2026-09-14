@@ -20,6 +20,51 @@ DESC_KEYS = ["description", "jobDescription", "duty", "Duty", "workContent", "re
 REQ_KEYS = ["requirement", "requirements", "Require", "serviceCondition", "qualification"]
 JOBISH_KEYS = set(JOB_TITLE_KEYS + JOB_ID_KEYS + LOC_KEYS + DESC_KEYS + REQ_KEYS)
 
+NAVIGATION_TITLES = {
+    "首页",
+    "岗位投递",
+    "职位投递",
+    "招聘动态",
+    "招聘资讯",
+    "活动日历",
+    "应届生招聘",
+    "校园招聘",
+    "实习生招聘",
+    "社会招聘",
+    "了解我们",
+    "了解海尔",
+    "关于我们",
+    "联系我们",
+    "全部职位",
+    "热招职位",
+    "登录",
+    "注册",
+    "home",
+    "jobs",
+    "careers",
+    "campus recruitment",
+    "internships",
+    "about us",
+    "contact us",
+    "sign in",
+    "log in",
+}
+JOB_DETAIL_URL_RE = re.compile(
+    r"(?:job|position|post|career|recruit)[^?#/]*(?:detail|view)|"
+    r"(?:detail|view)[^?#/]*(?:job|position|post)|"
+    r"/(?:job|jobs|position|positions|post|posts)/[^/?#]+|"
+    r"/(?:jobdetail|positiondetail|customizedjobdetail|customizedptjobdetail|deliverfirst)(?:/|\b)",
+    re.I,
+)
+JOBISH_URL_RE = re.compile(r"job|position|career|recruit|招聘|职位|岗位", re.I)
+ROLE_TITLE_RE = re.compile(
+    r"工程师|开发|算法|研究员|科学家|分析师|设计师|架构师|产品|运营|销售|市场|财务|会计|"
+    r"供应链|采购|质量|测试|顾问|专员|经理|管培|实习|技术|研发|制造|工艺|设备|数据|"
+    r"engineer|developer|scientist|analyst|architect|designer|manager|intern|research|sales|"
+    r"marketing|product|software|hardware|data|machine learning|\bai\b|qa|quality",
+    re.I,
+)
+
 
 def _json_shape(data: object) -> str:
     """Return a compact structural summary for diagnostics without dumping payloads."""
@@ -63,9 +108,41 @@ def _looks_like_job_object(obj: dict, raw_url: str) -> bool:
     """
     if any(key in obj and obj.get(key) not in (None, "", [], {}) for key in JOBISH_KEYS):
         return True
-    if raw_url and re.search(r"job|position|career|recruit|招聘|职位|岗位", raw_url, re.I):
+    if raw_url and JOBISH_URL_RE.search(raw_url):
         return True
     return False
+
+
+def _looks_like_job_anchor(title: str, href: str) -> bool:
+    """Reject navigation links and keep links with concrete job evidence.
+
+    Careers SPAs often have menu items such as ``岗位投递`` or ``招聘动态`` whose
+    text contains job-related words. Those links are not jobs and should never be
+    returned as normalized openings.
+    """
+    normalized_title = clean_text(title).strip()
+    if not normalized_title or normalized_title.lower() in NAVIGATION_TITLES:
+        return False
+    if not href:
+        return False
+    if JOB_DETAIL_URL_RE.search(href):
+        return True
+    return bool(JOBISH_URL_RE.search(href) and ROLE_TITLE_RE.search(normalized_title))
+
+
+def _quality_summary(jobs: dict[str, Job]) -> tuple[int, bool]:
+    """Return informative-job count and whether the result needs diagnostics."""
+    informative = sum(
+        bool(job.location or job.description or job.requirements or job.department or job.function)
+        for job in jobs.values()
+    )
+    count = len(jobs)
+    low_quality = count == 0 or informative == 0 or (
+        count <= 4 and informative < count
+    ) or (
+        count >= 5 and informative < max(3, count // 2)
+    )
+    return informative, low_quality
 
 
 class GenericBrowserAdapter(BaseAdapter):
@@ -135,11 +212,11 @@ class GenericBrowserAdapter(BaseAdapter):
                     except Exception:
                         return
                     absorb_json(data, response.url)
-                    if len(network_debug) < 30:
+                    if len(network_debug) < 50:
                         req = response.request
                         post_data = clean_text(req.post_data or "")
-                        if len(post_data) > 500:
-                            post_data = post_data[:500] + "..."
+                        if len(post_data) > 700:
+                            post_data = post_data[:700] + "..."
                         network_debug.append(
                             f"{response.status} {req.method} {response.url} | post={post_data or '-'} | {_json_shape(data)}"
                         )
@@ -199,9 +276,7 @@ class GenericBrowserAdapter(BaseAdapter):
                 try:
                     title = clean_text(anchor.inner_text())
                     href = canonical_url(anchor.get_attribute("href") or "", page.url)
-                    if not title or not href or len(title) > 120:
-                        continue
-                    if not re.search(r"job|position|career|recruit|招聘|职位|岗位", f"{href} {title}", re.I):
+                    if len(title) > 120 or not _looks_like_job_anchor(title, href):
                         continue
                     if options.keyword and options.keyword.lower() not in title.lower():
                         continue
@@ -209,13 +284,7 @@ class GenericBrowserAdapter(BaseAdapter):
                 except Exception:
                     pass
 
-            informative_jobs = sum(
-                bool(job.location or job.description or job.requirements or job.department or job.function)
-                for job in jobs.values()
-            )
-            low_quality = len(jobs) <= 2 or (
-                len(jobs) >= 5 and informative_jobs < max(3, len(jobs) // 2)
-            )
+            informative_jobs, low_quality = _quality_summary(jobs)
             if low_quality:
                 try:
                     body_text = clean_text(page.locator("body").inner_text())
