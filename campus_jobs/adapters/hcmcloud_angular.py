@@ -10,8 +10,8 @@ class HCMCloudAdapter(_HCMCloudAdapter):
 
     HCMCloud's ``hc-paging`` directive can update its page-number model without
     refreshing the job table. For these older portals we drive the job-list
-    controller itself (``paging.current_page`` + ``fetchData()``) and only accept
-    a transition after the first rendered ``hcm-key`` changes.
+    controller itself and only accept a transition after the first rendered
+    ``hcm-key`` changes.
     """
 
     def __init__(self) -> None:
@@ -90,6 +90,9 @@ class HCMCloudAdapter(_HCMCloudAdapter):
                 r"""
                 (target) => {
                   const ng = window.angular;
+                  const source = (fn) => typeof fn === 'function'
+                    ? String(fn).replace(/\s+/g, ' ').slice(0, 1800)
+                    : '';
                   const debug = {
                     target,
                     angularFound: !!ng,
@@ -123,6 +126,13 @@ class HCMCloudAdapter(_HCMCloudAdapter):
                         currentPage: hasPaging ? scope.paging.current_page : null,
                         pageCount: hasPaging ? scope.paging.page_count : null,
                         pageSize: hasPaging ? scope.paging.page_size : null,
+                        fetchDataSource: source(scope.fetchData),
+                        onPagingChangeSource: hasPaging
+                          ? source(scope.paging.onPagingChange) : '',
+                        refreshPageSource: hasPaging
+                          ? source(scope.paging.refreshPage) : '',
+                        canRefreshSource: hasPaging
+                          ? source(scope.paging._canRefresh) : '',
                       };
                       if (!hasPaging || !hasFetchData) continue;
 
@@ -159,6 +169,9 @@ class HCMCloudAdapter(_HCMCloudAdapter):
                 r"""
                 (target) => {
                   const ng = window.angular;
+                  const source = (fn) => typeof fn === 'function'
+                    ? String(fn).replace(/\s+/g, ' ').slice(0, 1800)
+                    : '';
                   const debug = {target, angularFound: !!ng, method: ''};
                   if (!ng) return debug;
                   const button = document.querySelector(
@@ -174,6 +187,9 @@ class HCMCloudAdapter(_HCMCloudAdapter):
                     debug.functions = Object.keys(scope.paging).filter(
                       (key) => typeof scope.paging[key] === 'function'
                     );
+                    debug.onPagingClickSource = source(scope.onPagingClick);
+                    debug.onPagingChangeSource = source(scope.paging.onPagingChange);
+                    debug.refreshPageSource = source(scope.paging.refreshPage);
                     if (typeof scope.paging.refreshPage !== 'function') return debug;
                     const run = () => {
                       scope.paging.current_page = target;
