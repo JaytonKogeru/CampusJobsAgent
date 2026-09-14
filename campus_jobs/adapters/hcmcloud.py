@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from urllib.parse import quote, urlparse
+from urllib.parse import urlparse
 
 from campus_jobs.browser_support import chromium_launch_kwargs, dismiss_dynamic_overlays
 from campus_jobs.models import CrawlOptions, CrawlResult, Job
@@ -22,7 +22,7 @@ _DOM_EXTRACT_JS = r"""
     const attrs = {};
     if (!node) return attrs;
     for (const attr of node.attributes || []) {
-      if (attr.name === 'id' || attr.name.startsWith('data-')) attrs[`${prefix}${attr.name}`] = attr.value;
+      if (attr.name === 'id' || attr.name === 'hcm-key' || attr.name.startsWith('data-')) attrs[`${prefix}${attr.name}`] = attr.value;
     }
     return attrs;
   };
@@ -30,6 +30,54 @@ _DOM_EXTRACT_JS = r"""
   const out = [];
   const seenNodes = new Set();
 
+  // Current HCMCloud public portals render the job list as a div-based
+  // grid. Each row exposes the underlying ReleaseJobMgr id in hcm-key.
+  // Use HCMCloud's own URL encoder in-page instead of reimplementing its
+  // private _HB5_ transformation.
+  const gridKeys = ['name', 'u_company_name', 'work_city', 'background', 'release_date', 'job_category'];
+  const gridHeaders = ['职位名称', '所属单位', '工作城市', '学历要求', '发布时间', '职位类别'];
+  for (const node of document.querySelectorAll('.table-body .table-row[hcm-key]')) {
+    if (!visible(node)) continue;
+    const nativeId = (node.getAttribute('hcm-key') || '').trim();
+    if (!nativeId) continue;
+
+    const byKey = {};
+    for (const cell of node.querySelectorAll('.table-cell[col-key]')) {
+      const key = (cell.getAttribute('col-key') || '').trim();
+      if (!key) continue;
+      const content = cell.querySelector('.cell-content') || cell;
+      byKey[key] = (content.innerText || '').replace(/\u00a0/g, ' ').trim();
+    }
+    const cells = gridKeys.map((key) => byKey[key] || '');
+    const title = (cells[0] || '').trim();
+    if (title.length < 2 || title.length > 120 || badTitle.test(title)) continue;
+
+    let href = '';
+    let encodedId = '';
+    try {
+      if (typeof window.hcmUrlParamEncoder === 'function') {
+        encodedId = String(window.hcmUrlParamEncoder(nativeId) || '');
+        if (encodedId) href = `#/portal_job_detail?id=${encodeURIComponent(encodedId)}`;
+      }
+    } catch (e) {
+      encodedId = '';
+    }
+
+    out.push({
+      title,
+      href,
+      text: cells.filter(Boolean).join('\n'),
+      lines: cells.filter(Boolean),
+      cells,
+      headers: gridHeaders,
+      className: String(node.className || ''),
+      attrs: attrMap(node),
+      nativeId,
+      encodedId,
+      kind: 'hcmcloud-grid'
+    });
+    seenNodes.add(node);
+  }
   // Some HCMCloud tenants use a native table.
   for (const table of document.querySelectorAll('table')) {
     if (!visible(table)) continue;
@@ -262,6 +310,10 @@ class HCMCloudAdapter(BaseAdapter):
 
     @staticmethod
     def _extract_id(row: dict[str, object]) -> str:
+        native_id = clean_text(row.get("nativeId"))
+        if native_id:
+            return native_id
+
         href = clean_text(row.get("href"))
         for pattern in _ID_PATTERNS:
             match = pattern.search(href)
@@ -272,7 +324,12 @@ class HCMCloudAdapter(BaseAdapter):
         if isinstance(attrs, dict):
             for key, value in attrs.items():
                 low = str(key).lower()
-                if "job" not in low and "position" not in low and low not in {"data-id", "id", "a:data-id"}:
+                if "job" not in low and "position" not in low and low not in {
+                    "data-id",
+                    "id",
+                    "a:data-id",
+                    "hcm-key",
+                }:
                     continue
                 candidate = clean_text(value)
                 if candidate and len(candidate) <= 160:
@@ -467,10 +524,9 @@ class HCMCloudAdapter(BaseAdapter):
         href = clean_text(row.get("href"))
         if href and not href.lower().startswith("javascript:"):
             return canonical_url(href, source_url)
-        parsed = urlparse(source_url)
-        root = f"{parsed.scheme or 'https'}://{parsed.netloc}"
-        if job_id and not job_id.startswith("dom-"):
-            return f"{root}/recruit#/portal_job_detail?job_id={quote(job_id, safe='')}"
+        # HCMCloud's detail route encodes ids through its frontend
+        # hcmUrlParamEncoder. The rendered-grid extractor stores that exact
+        # official route in href; do not fabricate an unverified id parameter.
         return source_url
 
     def _normalize_row(

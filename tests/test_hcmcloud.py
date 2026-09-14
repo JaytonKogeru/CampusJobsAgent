@@ -89,3 +89,26 @@ def test_row_signature_changes_with_page_content():
     a = [{"title": "算法工程师", "href": "#/job/1", "text": "算法工程师\n济南"}]
     b = [{"title": "算法工程师", "href": "#/job/2", "text": "算法工程师\n济南"}]
     assert HCMCloudAdapter._row_signature(a) != HCMCloudAdapter._row_signature(b)
+
+
+def test_extract_native_hcmcloud_id():
+    row = {"href": "", "nativeId": "59959", "attrs": {"hcm-key": "59959"}}
+    assert HCMCloudAdapter._extract_id(row) == "59959"
+
+
+def test_extract_native_hcmcloud_id_from_hcm_key_attribute():
+    row = {"href": "", "attrs": {"hcm-key": "60354"}}
+    assert HCMCloudAdapter._extract_id(row) == "60354"
+
+
+def test_native_detail_href_is_preserved():
+    row = {
+        "href": "#/portal_job_detail?id=_HB5_NTkaNTk%253D",
+        "nativeId": "59959",
+        "attrs": {"hcm-key": "59959"},
+    }
+    assert HCMCloudAdapter._job_url(
+        "https://inspur.hcmcloud.cn/recruit#/portal_job_list",
+        row,
+        "59959",
+    ) == "https://inspur.hcmcloud.cn/recruit#/portal_job_detail?id=_HB5_NTkaNTk%253D"
