@@ -13,6 +13,38 @@ def test_expected_pages_pattern():
     assert HCMCloudAdapter._expected_pages("没有分页") is None
 
 
+def test_semantic_grid_parsing():
+    text = """新的机会 (186)
+职位名称
+所属单位
+工作城市
+学历要求
+发布时间
+职位类别
+软件研发工程师（Java）
+浪潮数字企业技术有限公司
+山东省济南市
+本科及以上
+2026-07-21
+研发类
+人工智能研究员
+浪潮软件股份有限公司
+山东省济南市
+硕士及以上
+2026-08-30
+核心研发类
+当前第
+/ 10
+页
+20 条/页
+"""
+    rows = HCMCloudAdapter._semantic_rows_from_text(text)
+    assert len(rows) == 2
+    assert rows[0]["title"] == "软件研发工程师（Java）"
+    assert rows[0]["cells"][1] == "浪潮数字企业技术有限公司"
+    assert rows[1]["cells"][4] == "2026-08-30"
+
+
 def test_extract_job_id_from_href():
     row = {"href": "#/portal_job_detail?job_id=abc-123", "attrs": {}}
     assert HCMCloudAdapter._extract_id(row) == "abc-123"
