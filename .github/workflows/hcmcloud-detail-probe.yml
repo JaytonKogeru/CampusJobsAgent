@@ -79,7 +79,7 @@ jobs:
                         const node = root.querySelector('[key="job_desc"] .component-input-inner.ng-binding');
                         const text = String(detail.job_desc || (node && node.textContent) || '').trim();
                         return text.length > 20;
-                      }''', item['id'], timeout=8000)
+                      }''', arg=item['id'], timeout=8000)
                       desc = page.evaluate('''() => {
                         const root = document.querySelector('.portal-job-detail-pc');
                         const scope = angular.element(root).scope();
