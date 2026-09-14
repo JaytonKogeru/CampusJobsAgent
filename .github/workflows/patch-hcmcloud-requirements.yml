@@ -1,0 +1,41 @@
+name: One-shot HCMCloud requirements patch
+
+on:
+  push:
+    branches:
+      - feat/hcmcloud-inspur-e2e
+    paths:
+      - .github/workflows/patch-hcmcloud-requirements.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/hcmcloud-inspur-e2e
+
+      - name: Map education into serialized requirements
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('campus_jobs/adapters/hcmcloud.py')
+          text = path.read_text(encoding='utf-8')
+          needle = "            published_at=published_at,\n            extra={"
+          replacement = "            published_at=published_at,\n            requirements=education,\n            extra={"
+          assert text.count(needle) == 1, f'unexpected match count: {text.count(needle)}'
+          path.write_text(text.replace(needle, replacement), encoding='utf-8')
+          PY
+
+      - name: Commit patch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add campus_jobs/adapters/hcmcloud.py
+          git commit -m 'hcmcloud: expose education as requirements'
+          git push origin HEAD:feat/hcmcloud-inspur-e2e
