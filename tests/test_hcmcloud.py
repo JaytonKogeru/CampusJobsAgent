@@ -1,4 +1,5 @@
 from campus_jobs.adapters.hcmcloud import HCMCloudAdapter
+from campus_jobs.models import CrawlOptions
 
 
 def test_expected_total_patterns():
@@ -43,6 +44,35 @@ def test_semantic_grid_parsing():
     assert rows[0]["title"] == "软件研发工程师（Java）"
     assert rows[0]["cells"][1] == "浪潮数字企业技术有限公司"
     assert rows[1]["cells"][4] == "2026-08-30"
+
+
+def test_semantic_grid_education_maps_to_serialized_requirements():
+    row = {
+        "title": "软件研发工程师（Java）",
+        "href": "",
+        "text": "软件研发工程师（Java）\n浪潮数字企业技术有限公司\n山东省济南市\n本科及以上\n2026-07-21\n研发类",
+        "cells": [
+            "软件研发工程师（Java）",
+            "浪潮数字企业技术有限公司",
+            "山东省济南市",
+            "本科及以上",
+            "2026-07-21",
+            "研发类",
+        ],
+        "attrs": {},
+        "kind": "semantic-grid",
+        "_page_number": 1,
+        "_row_number": 1,
+    }
+    job = HCMCloudAdapter()._normalize_row(
+        "https://inspur.hcmcloud.cn/recruit#/portal_job_list",
+        row,
+        "浪潮",
+        CrawlOptions(),
+    )
+    assert job is not None
+    assert job.requirements == "本科及以上"
+    assert job.to_dict()["requirements"] == "本科及以上"
 
 
 def test_extract_job_id_from_href():
