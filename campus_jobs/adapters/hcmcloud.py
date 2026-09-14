@@ -827,7 +827,8 @@ class HCMCloudAdapter(BaseAdapter):
 
         with sync_playwright() as p:
             browser = p.chromium.launch(**chromium_launch_kwargs())
-            page = browser.new_page(viewport={"width": 1440, "height": 1000})
+            context = browser.new_context(viewport={"width": 1440, "height": 1000})
+            page = context.new_page()
 
             def on_response(response):
                 try:
