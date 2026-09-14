@@ -5,20 +5,24 @@ on:
   pull_request:
     paths:
       - "campus_jobs/adapters/hcmcloud.py"
+      - "campus_jobs/adapters/generic_browser.py"
       - "campus_jobs/browser_support.py"
       - "campus_jobs/detector.py"
       - "campus_jobs/adapters/__init__.py"
       - "tests/test_hcmcloud.py"
+      - "tests/test_generic_browser.py"
       - ".github/workflows/hcmcloud-e2e.yml"
   push:
     branches:
       - "feat/**"
     paths:
       - "campus_jobs/adapters/hcmcloud.py"
+      - "campus_jobs/adapters/generic_browser.py"
       - "campus_jobs/browser_support.py"
       - "campus_jobs/detector.py"
       - "campus_jobs/adapters/__init__.py"
       - "tests/test_hcmcloud.py"
+      - "tests/test_generic_browser.py"
       - ".github/workflows/hcmcloud-e2e.yml"
 
 permissions:
@@ -42,7 +46,7 @@ jobs:
           google-chrome --version || google-chrome-stable --version || chromium --version || true
 
       - name: Unit tests
-        run: pytest tests/test_hcmcloud.py tests/test_detector.py
+        run: pytest tests/test_hcmcloud.py tests/test_generic_browser.py tests/test_detector.py
 
       - name: Crawl Inspur HCMCloud
         run: |
@@ -56,7 +60,7 @@ jobs:
             --out /tmp/inspur-hcmcloud.json
           cat /tmp/inspur-hcmcloud.json
 
-      - name: Validate completeness and pagination quality
+      - name: Validate completeness, fields and pagination quality
         run: |
           python - <<'PY'
           import json
@@ -84,7 +88,25 @@ jobs:
           assert len(ids) == len(set(ids)), 'duplicate job ids detected'
           assert all(title and title != '浪潮' for title in titles), titles[:20]
           assert not bad, bad
-          print(f"validated adapter=hcmcloud count={len(jobs)} warnings={len(warnings)}")
+
+          core_fields = ('company', 'location', 'function', 'published_at')
+          complete_core = sum(
+              all(str(job.get(field) or '').strip() for field in core_fields)
+              for job in jobs
+          )
+          education_present = sum(
+              bool(str((job.get('extra') or {}).get('education') or '').strip())
+              for job in jobs
+          )
+          core_ratio = complete_core / len(jobs)
+          education_ratio = education_present / len(jobs)
+          assert core_ratio >= 0.95, f'core field coverage too low: {core_ratio:.1%}'
+          assert education_ratio >= 0.95, f'education coverage too low: {education_ratio:.1%}'
+
+          print(
+              f"validated adapter=hcmcloud count={len(jobs)} warnings={len(warnings)} "
+              f"core_fields={core_ratio:.1%} education={education_ratio:.1%}"
+          )
           PY
 
       - name: Upload live result
