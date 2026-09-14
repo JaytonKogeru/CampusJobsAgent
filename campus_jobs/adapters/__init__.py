@@ -4,7 +4,7 @@ from .bambulab import BambuLabAdapter
 from .beisen_zhiye import BeisenZhiyeAdapter
 from .generic_browser import GenericBrowserAdapter
 from .greenhouse import GreenhouseAdapter
-from .hcmcloud_angular import HCMCloudAdapter
+from .hcmcloud_angular import HCMCloudAdapter  # AngularJS pager driver
 from .jobpro_bridge import JobProBridgeAdapter
 from .lever import LeverAdapter
 from .midea import MideaCampusAdapter
