@@ -30,8 +30,7 @@ _DOM_EXTRACT_JS = r"""
   const out = [];
   const seenNodes = new Set();
 
-  // HCMCloud tenants commonly render jobs as a table. Require job-like headers
-  // instead of accepting every table on the page.
+  // Some HCMCloud tenants use a native table.
   for (const table of document.querySelectorAll('table')) {
     if (!visible(table)) continue;
     const headers = [...table.querySelectorAll('thead th, thead [role="columnheader"]')]
@@ -66,7 +65,7 @@ _DOM_EXTRACT_JS = r"""
     }
   }
 
-  // Family fallback for HCMCloud tenants that use cards/lists instead of tables.
+  // Family fallback for tenants that use cards/lists instead of tables.
   const selectors = [
     'a[href*="portal_job"]',
     'a[href*="job_id"]',
@@ -132,7 +131,7 @@ _PAGINATION_DEBUG_JS = r"""
     for (let i = 0; i < 5 && parent; i++, parent = parent.parentElement) {
       const text = (parent.innerText || '').replace(/\s+/g, ' ').trim();
       const cls = String(parent.className || '');
-      if (/page|pager|pagination/i.test(cls) || (text.includes('页') && (text.includes('当前第') || text.includes('条/页')))) {
+      if (/page|pager|paging|pagination/i.test(cls) || (text.includes('页') && text.includes('当前第'))) {
         context = `${cls} :: ${text}`;
         break;
       }
@@ -170,6 +169,9 @@ _ID_PATTERNS = (
     re.compile(r"(?:job_id|jobId|position_id|positionId|post_id|postId)=([^&#]+)", re.I),
     re.compile(r"/(?:job|position|post)/([^/?#&]+)", re.I),
 )
+
+_SEMANTIC_HEADERS = ["职位名称", "所属单位", "工作城市", "学历要求", "发布时间", "职位类别"]
+_DATE_RE = re.compile(r"^\d{4}-\d{1,2}-\d{1,2}$")
 
 
 class HCMCloudAdapter(BaseAdapter):
@@ -216,6 +218,49 @@ class HCMCloudAdapter(BaseAdapter):
         return None
 
     @staticmethod
+    def _semantic_rows_from_text(text: str) -> list[dict[str, object]]:
+        """Parse div-based HCMCloud grids from their stable six-column text contract."""
+        lines = [clean_text(line) for line in (text or "").splitlines() if clean_text(line)]
+        start = -1
+        width = len(_SEMANTIC_HEADERS)
+        for index in range(0, max(0, len(lines) - width + 1)):
+            if lines[index : index + width] == _SEMANTIC_HEADERS:
+                start = index + width
+                break
+        if start < 0:
+            return []
+
+        end = len(lines)
+        for index in range(start, len(lines)):
+            if lines[index].startswith("当前第"):
+                end = index
+                break
+
+        payload = lines[start:end]
+        rows: list[dict[str, object]] = []
+        index = 0
+        while index + width <= len(payload):
+            cells = payload[index : index + width]
+            if _DATE_RE.match(cells[4]) and cells[0] not in _SEMANTIC_HEADERS:
+                rows.append(
+                    {
+                        "title": cells[0],
+                        "href": "",
+                        "text": "\n".join(cells),
+                        "lines": cells,
+                        "cells": cells,
+                        "headers": list(_SEMANTIC_HEADERS),
+                        "className": "semantic-grid",
+                        "attrs": {},
+                        "kind": "semantic-grid",
+                    }
+                )
+                index += width
+            else:
+                index += 1
+        return rows
+
+    @staticmethod
     def _extract_id(row: dict[str, object]) -> str:
         href = clean_text(row.get("href"))
         for pattern in _ID_PATTERNS:
@@ -250,13 +295,21 @@ class HCMCloudAdapter(BaseAdapter):
             return ""
         return text if len(text) <= limit else text[:limit] + "..."
 
-    @staticmethod
-    def _extract_rows(page) -> list[dict[str, object]]:
+    @classmethod
+    def _extract_rows(cls, page) -> list[dict[str, object]]:
         try:
             rows = page.evaluate(_DOM_EXTRACT_JS)
         except Exception:
+            rows = []
+        if isinstance(rows, list):
+            parsed = [row for row in rows if isinstance(row, dict)]
+            if parsed:
+                return parsed
+        try:
+            body_text = page.locator("body").inner_text()
+        except Exception:
             return []
-        return [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
+        return cls._semantic_rows_from_text(body_text)
 
     @staticmethod
     def _pagination_debug(page) -> str:
@@ -302,6 +355,7 @@ class HCMCloudAdapter(BaseAdapter):
             "a[class*='next']",
             "[class*='pagination'] [class*='next']",
             "[class*='pager'] [class*='next']",
+            "[class*='paging'] [class*='next']",
             "[class*='page'] [class*='next']",
         )
         for selector in selectors:
@@ -336,38 +390,34 @@ class HCMCloudAdapter(BaseAdapter):
                 except Exception:
                     continue
 
-        # Inspur's current HCMCloud pager renders the current-page control as an
-        # input between "当前第" and "/ N 页". Filling it is more robust than
-        # depending on tenant-specific icon class names.
-        try:
-            inputs = page.locator("input")
-            count = min(inputs.count(), 30)
-        except Exception:
-            count = 0
-            inputs = None
-        for index in range(count):
-            item = inputs.nth(index)
+        # Inspur's pager exposes the current page as an input inside paging-box.
+        # Restrict the search to pagination-class ancestors; climbing into the
+        # whole job-list would also match unrelated filter inputs.
+        for selector in (
+            "[class*='paging'] input",
+            "[class*='pagination'] input",
+            "[class*='pager'] input",
+            "[class*='page-box'] input",
+        ):
             try:
-                if not item.is_visible() or item.is_disabled():
-                    continue
-                ancestor = item
-                context = ""
-                for _ in range(5):
-                    ancestor = ancestor.locator("xpath=..")
-                    context = clean_text(ancestor.inner_text())
-                    if "页" in context and ("当前第" in context or "条/页" in context):
-                        break
-                if "页" not in context or ("当前第" not in context and "条/页" not in context):
-                    continue
-                item.fill(str(next_page_number))
-                item.press("Enter")
-                return True, "page-input"
+                inputs = page.locator(selector)
+                count = min(inputs.count(), 12)
             except Exception:
                 continue
+            for index in range(count):
+                item = inputs.nth(index)
+                try:
+                    if not item.is_visible() or item.is_disabled():
+                        continue
+                    item.fill(str(next_page_number))
+                    item.press("Enter")
+                    return True, f"page-input:{selector}"
+                except Exception:
+                    continue
 
         # Last-resort custom pager handling: only inspect compact containers that
-        # clearly identify themselves as pagination. Never click arbitrary page buttons.
-        for selector in ("[class*='pagination']", "[class*='pager']", "[class*='page']"):
+        # clearly identify themselves as pagination. Never click arbitrary controls.
+        for selector in ("[class*='pagination']", "[class*='pager']", "[class*='paging']", "[class*='page-box']"):
             try:
                 containers = page.locator(selector)
                 container_count = min(containers.count(), 30)
@@ -440,7 +490,11 @@ class HCMCloudAdapter(BaseAdapter):
 
         job_id = self._extract_id(row)
         if not job_id:
-            digest = hashlib.sha1(f"{title}\n{text}".encode("utf-8", errors="ignore")).hexdigest()[:16]
+            page_number = clean_text(row.get("_page_number"))
+            row_number = clean_text(row.get("_row_number"))
+            digest = hashlib.sha1(
+                f"{page_number}:{row_number}\n{title}\n{text}".encode("utf-8", errors="ignore")
+            ).hexdigest()[:16]
             job_id = f"dom-{digest}"
 
         cells = row.get("cells") if isinstance(row.get("cells"), list) else []
@@ -560,14 +614,15 @@ class HCMCloudAdapter(BaseAdapter):
                     expected_pages = max(expected_pages or 0, page_total)
 
                 new_jobs = 0
-                for row in rows:
+                for row_index, row in enumerate(rows, 1):
+                    row.setdefault("_page_number", page_index + 1)
+                    row.setdefault("_row_number", row_index)
                     job = self._normalize_row(url, row, company_state["name"], options)
                     if job is None:
                         continue
-                    key = job.id if not job.id.startswith("dom-") else f"{job.title}\n{job.extra.get('list_text', '')}"
-                    if key in jobs:
+                    if job.id in jobs:
                         continue
-                    jobs[key] = job
+                    jobs[job.id] = job
                     new_jobs += 1
                     if len(jobs) >= options.max_jobs:
                         pagination_reason = "max-jobs"
