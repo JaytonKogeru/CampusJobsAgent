@@ -14,6 +14,8 @@ def test_hcmcloud_detection():
 def test_hcmcloud_total_hint():
     assert HCMCloudAdapter._total_hint("当前共 68 个职位") == 68
     assert HCMCloudAdapter._total_hint("岗位共 123 条") == 123
+    assert HCMCloudAdapter._total_hint("新的机会 (186)") == 186
+    assert HCMCloudAdapter._total_hint("共计 186 条") == 186
     assert HCMCloudAdapter._total_hint("欢迎加入我们") is None
 
 
@@ -32,6 +34,29 @@ def test_hcmcloud_candidate_normalization():
     assert job.title == "AI算法工程师"
     assert job.location == "济南"
     assert "portal_job_detail" in job.url
+
+
+def test_hcmcloud_virtual_row_builds_detail_url():
+    job = HCMCloudAdapter._candidate_to_job(
+        {
+            "id": "59959",
+            "title": "软件研发工程师（Java）",
+            "company": "浪潮数字企业技术有限公司",
+            "location": "山东省济南市",
+            "education": "本科及以上",
+            "published_at": "2026-07-21",
+            "function": "研发类",
+        },
+        "https://inspur.hcmcloud.cn/recruit#/portal_job_list?job_class=campus",
+        "inspur.hcmcloud.cn",
+    )
+    assert job is not None
+    assert job.id == "59959"
+    assert job.company == "浪潮数字企业技术有限公司"
+    assert job.location == "山东省济南市"
+    assert job.function == "研发类"
+    assert job.published_at == "2026-07-21"
+    assert job.url == "https://inspur.hcmcloud.cn/recruit#/portal_job_detail?id=59959"
 
 
 def test_hcmcloud_rejects_company_as_job():
