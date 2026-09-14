@@ -1,17 +1,15 @@
 from __future__ import annotations
 
+import json
+
 from .hcmcloud import HCMCloudAdapter as _HCMCloudAdapter
 
 
 class HCMCloudAdapter(_HCMCloudAdapter):
-    """HCMCloud adapter with an AngularJS-aware pager driver.
+    """HCMCloud adapter with an AngularJS-aware pager driver."""
 
-    Older HCMCloud portals expose pagination through the ``hc-paging`` AngularJS
-    directive. Native Playwright clicks can be intercepted by the virtual table or
-    ignored during a digest. Drive the directive through its own scope first, then
-    fall back to the exact DOM handler. Every transition is verified against both
-    the visible page-number model and the first rendered ``hcm-key`` row.
-    """
+    def __init__(self) -> None:
+        self._last_pager_debug: dict[str, object] = {}
 
     @staticmethod
     def _pager_page(page) -> int | None:
@@ -33,52 +31,93 @@ class HCMCloudAdapter(_HCMCloudAdapter):
             return None
 
     @staticmethod
-    def _invoke_angular_next(page) -> str:
+    def _invoke_angular_next(page) -> dict[str, object]:
         try:
             result = page.evaluate(
                 r"""
                 () => {
-                  const button = document.querySelector(
-                    `.hc-paging [ng-click*="onPagingClick('next')"]`
+                  const selector = `.hc-paging [ng-click*="onPagingClick('next')"]`;
+                  const button = document.querySelector(selector);
+                  const input = document.querySelector(
+                    '.hc-paging input[ng-model="paging.current_page"]'
                   );
-                  if (!button) return 'missing-button';
+                  const firstRow = document.querySelector('.table-row[hcm-key]');
+                  const debug = {
+                    selector,
+                    buttonFound: !!button,
+                    buttonClass: button ? String(button.className || '') : '',
+                    angularFound: !!window.angular,
+                    inputBefore: input ? input.value : null,
+                    firstKeyBefore: firstRow ? firstRow.getAttribute('hcm-key') : null,
+                    scopes: [],
+                    method: '',
+                  };
+                  if (!button) {
+                    debug.method = 'missing-button';
+                    return debug;
+                  }
                   if (/(^|\s)disable(\s|$)/.test(button.className || '')) {
-                    return 'disabled';
+                    debug.method = 'disabled';
+                    return debug;
                   }
 
                   const ng = window.angular;
                   if (ng) {
                     const nodes = [
-                      button,
-                      button.closest('.paging-box'),
-                      button.closest('.hc-paging'),
-                      document.querySelector('hc-paging'),
-                    ].filter(Boolean);
-                    for (const node of nodes) {
+                      ['button', button],
+                      ['paging-box', button.closest('.paging-box')],
+                      ['hc-paging-div', button.closest('.hc-paging')],
+                      ['hc-paging-host', document.querySelector('hc-paging')],
+                    ];
+                    for (const [label, node] of nodes) {
+                      if (!node) continue;
                       try {
                         const wrapped = ng.element(node);
-                        const scope =
-                          (typeof wrapped.isolateScope === 'function' && wrapped.isolateScope())
-                          || (typeof wrapped.scope === 'function' && wrapped.scope());
-                        if (!scope || typeof scope.onPagingClick !== 'function') continue;
-                        const run = () => scope.onPagingClick('next');
-                        if (scope.$$phase) run();
-                        else scope.$apply(run);
-                        return 'angular-scope';
-                      } catch (_) {
-                        // Keep trying parent scopes before using the DOM handler.
+                        const isolate = typeof wrapped.isolateScope === 'function'
+                          ? wrapped.isolateScope() : null;
+                        const normal = typeof wrapped.scope === 'function'
+                          ? wrapped.scope() : null;
+                        for (const [kind, scope] of [['isolate', isolate], ['scope', normal]]) {
+                          if (!scope) continue;
+                          const entry = {
+                            label,
+                            kind,
+                            hasOnPagingClick: typeof scope.onPagingClick === 'function',
+                            currentPage: scope.paging ? scope.paging.current_page : null,
+                            pageCount: scope.paging ? scope.paging.page_count : null,
+                            pageSize: scope.paging ? scope.paging.page_size : null,
+                          };
+                          debug.scopes.push(entry);
+                          if (entry.hasOnPagingClick) {
+                            const run = () => scope.onPagingClick('next');
+                            if (scope.$$phase) run();
+                            else scope.$apply(run);
+                            debug.method = `angular:${label}:${kind}`;
+                            debug.inputAfter = input ? input.value : null;
+                            debug.scopeCurrentAfter = scope.paging
+                              ? scope.paging.current_page : null;
+                            return debug;
+                          }
+                        }
+                      } catch (error) {
+                        debug.scopes.push({
+                          label,
+                          error: String(error && error.message || error),
+                        });
                       }
                     }
                   }
 
                   button.click();
-                  return 'dom-click';
+                  debug.method = 'dom-click';
+                  debug.inputAfter = input ? input.value : null;
+                  return debug;
                 }
                 """
             )
-            return str(result or "")
-        except Exception:
-            return ""
+            return result if isinstance(result, dict) else {"method": str(result or "")}
+        except Exception as exc:
+            return {"method": "evaluate-error", "error": f"{type(exc).__name__}: {exc}"}
 
     @classmethod
     def _wait_for_target_page(
@@ -107,10 +146,6 @@ class HCMCloudAdapter(_HCMCloudAdapter):
 
         if cls._wait_for_row_change(page, previous_key, timeout=timeout):
             return True
-
-        # Some builds update the page model before swapping the virtualized rows.
-        # Give the table one final bounded settle window, but never accept a page
-        # transition solely because the page-number input changed.
         page.wait_for_timeout(1500)
         try:
             first_key = page.evaluate(
@@ -123,33 +158,49 @@ class HCMCloudAdapter(_HCMCloudAdapter):
         except Exception:
             return False
 
-    @classmethod
-    def _advance_page(cls, page, target_page: int, previous_key: str) -> str:
-        current = cls._pager_page(page)
+    def _advance_page(self, page, target_page: int, previous_key: str) -> str:
+        current = self._pager_page(page)
+        self._last_pager_debug = {
+            "target": target_page,
+            "currentBefore": current,
+            "previousKey": previous_key,
+            "attempts": [],
+        }
         if current is not None and current >= target_page:
-            # A prior asynchronous transition completed just before this call.
-            if cls._wait_for_row_change(page, previous_key, timeout=2500):
+            if self._wait_for_row_change(page, previous_key, timeout=2500):
                 return f"hc-paging-already:{current}"
 
         for attempt in range(2):
-            method = cls._invoke_angular_next(page)
+            detail = self._invoke_angular_next(page)
+            self._last_pager_debug["attempts"].append(detail)
+            method = str(detail.get("method") or "")
             if method == "disabled":
                 return ""
-            if method and cls._wait_for_target_page(
+            if method and self._wait_for_target_page(
                 page,
                 target_page,
                 previous_key,
                 timeout=9000,
             ):
+                self._last_pager_debug["currentAfter"] = self._pager_page(page)
                 return f"hc-paging-{method}:{attempt + 1}"
 
-            observed = cls._pager_page(page)
+            observed = self._pager_page(page)
+            self._last_pager_debug["observedAfterAttempt"] = observed
             if observed == target_page:
-                # The model advanced but row replacement is still in flight. Do
-                # not click again and accidentally skip a page.
-                if cls._wait_for_row_change(page, previous_key, timeout=12000):
+                if self._wait_for_row_change(page, previous_key, timeout=12000):
                     return f"hc-paging-delayed:{target_page}"
                 return ""
             page.wait_for_timeout(1000)
 
+        self._last_pager_debug["currentFinal"] = self._pager_page(page)
         return ""
+
+    def crawl(self, url, options):
+        result = super().crawl(url, options)
+        if any(w.startswith("QUALITY_FAIL pagination") for w in result.warnings):
+            result.warnings.append(
+                "HCMCloud pager debug: "
+                + json.dumps(self._last_pager_debug, ensure_ascii=False, default=str)
+            )
+        return result
