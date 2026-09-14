@@ -26,22 +26,18 @@ jobs:
           python -m pip install -U pip
           pip install -e '.[browser,dev]'
           google-chrome --version || google-chrome-stable --version || chromium --version || true
-      - name: Trace HCMCloud detail routing and HB5 encoder
+      - name: Inspect HCMCloud URL encoder
         run: |
           python - <<'PY'
           import json
-          import re
           from pathlib import Path
 
           from playwright.sync_api import sync_playwright
           from campus_jobs.browser_support import chromium_launch_kwargs, dismiss_dynamic_overlays
 
           URL = 'https://inspur.hcmcloud.cn/recruit#/portal_job_list?job_class=_HB5_Y2FtcHVz&filter_dict=_HB5_eyJf!m9iX2NsYXNzIjoiY2FtcHVzIiwic2VsZWN0X2RlcGFydCI6bnVsbH0%253D'
-          terms = [
-              'portal_job_detail', '_HB5_', 'HB5', 'hcm-key', 'hcm_param',
-              'hcm_transfer_strategy', 'base64', 'btoa(', 'atob(',
-          ]
-          report = {'source_url': URL, 'bundles': [], 'matches': []}
+          ids = ['59959', '60354', '59880', '59970', '60007', '59966']
+          report = {'source_url': URL, 'encodings': {}}
 
           with sync_playwright() as p:
               browser = p.chromium.launch(**chromium_launch_kwargs())
@@ -52,39 +48,27 @@ jobs:
               dismiss_dynamic_overlays(page, max_rounds=6)
               page.wait_for_selector('.table-row[hcm-key]', state='visible', timeout=25000)
 
-              sources = page.evaluate('''() => [...new Set([
-                ...[...document.scripts].map(s => s.src).filter(Boolean),
-                ...performance.getEntriesByType('resource').map(r => r.name).filter(x => /\\.js(?:[?#]|$)/i.test(x))
-              ])].filter(x => /\/(?:index|common)-[a-f0-9]+\.js(?:[?#]|$)/i.test(x))''')
-
-              for src in sources:
-                  bundle = {'url': src}
-                  try:
-                      resp = context.request.get(src, timeout=30000)
-                      text = resp.text()
-                      bundle.update({'status': resp.status, 'bytes': len(text)})
-                      for term in terms:
-                          positions = [m.start() for m in re.finditer(re.escape(term), text, re.I)]
-                          bundle[f'count:{term}'] = len(positions)
-                          for pos in positions[:20]:
-                              report['matches'].append({
-                                  'url': src,
-                                  'term': term,
-                                  'offset': pos,
-                                  'snippet': text[max(0, pos - 1500):min(len(text), pos + 2500)].replace('\n', ' '),
-                              })
-                  except Exception as exc:
-                      bundle['error'] = f'{type(exc).__name__}: {exc}'
-                  report['bundles'].append(bundle)
+              report['encoder_type'] = page.evaluate('() => typeof window.hcmUrlParamEncoder')
+              report['decoder_type'] = page.evaluate('() => typeof window.hcmUrlParamDecoder')
+              for job_id in ids:
+                  report['encodings'][job_id] = page.evaluate('''jobId => {
+                    const raw = String(window.hcmUrlParamEncoder(jobId));
+                    let decoded = null;
+                    try { decoded = String(window.hcmUrlParamDecoder(raw)); } catch (e) { decoded = String(e); }
+                    return {
+                      raw,
+                      encodeURIComponent: encodeURIComponent(raw),
+                      decoded,
+                      directHash: '#/portal_job_detail?id=' + raw,
+                      encodedHash: '#/portal_job_detail?id=' + encodeURIComponent(raw),
+                    };
+                  }''', job_id)
               browser.close()
 
           Path('/tmp/hcmcloud-native-detail-probe.json').write_text(
               json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8'
           )
-          priority = [m for m in report['matches'] if m['term'].lower() in {
-              'portal_job_detail', '_hb5_', 'hb5', 'hcm-key', 'hcm_param', 'hcm_transfer_strategy'
-          }]
-          print(json.dumps({'bundles': report['bundles'], 'priority_matches': priority[:50]}, ensure_ascii=False, indent=2))
+          print(json.dumps(report, ensure_ascii=False, indent=2))
           PY
       - name: Upload probe
         if: always()
