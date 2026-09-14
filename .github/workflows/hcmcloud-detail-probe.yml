@@ -41,16 +41,28 @@ jobs:
               page = browser.new_page(viewport={'width': 1440, 'height': 1000})
               t0 = time.perf_counter()
               page.goto(listing, wait_until='domcontentloaded', timeout=45000)
-              page.wait_for_timeout(1200)
+              page.wait_for_timeout(2500)
               dismiss_dynamic_overlays(page, max_rounds=8)
-              page.wait_for_selector('.table-row[hcm-key]', state='visible', timeout=25000)
+              page.wait_for_timeout(900)
+              rows = []
+              for _ in range(25):
+                  rows = page.evaluate('''() => [...document.querySelectorAll('.table-body .table-row[hcm-key]')].filter(row => {
+                    const r = row.getBoundingClientRect();
+                    const s = getComputedStyle(row);
+                    return r.width > 2 && r.height > 2 && s.display !== 'none' && s.visibility !== 'hidden';
+                  }).slice(0, 10).map(row => {
+                    const id = String(row.getAttribute('hcm-key') || '');
+                    const title = (row.querySelector('.table-cell[col-key="name"] .cell-content')?.innerText || '').trim();
+                    const encoded = String(window.hcmUrlParamEncoder(id));
+                    return {id, title, hash: '#/portal_job_detail?id=' + encodeURIComponent(encoded)};
+                  })''')
+                  if rows:
+                      break
+                  dismiss_dynamic_overlays(page, max_rounds=2)
+                  page.wait_for_timeout(400)
+              if not rows:
+                  raise RuntimeError('list did not render native HCMCloud rows')
               report['list_ready_s'] = round(time.perf_counter() - t0, 3)
-              rows = page.evaluate('''() => [...document.querySelectorAll('.table-body .table-row[hcm-key]')].slice(0, 10).map(row => {
-                const id = String(row.getAttribute('hcm-key') || '');
-                const title = (row.querySelector('.table-cell[col-key="name"] .cell-content')?.innerText || '').trim();
-                const encoded = String(window.hcmUrlParamEncoder(id));
-                return {id, title, hash: '#/portal_job_detail?id=' + encodeURIComponent(encoded)};
-              })''')
 
               for item in rows:
                   started = time.perf_counter()
@@ -63,10 +75,18 @@ jobs:
                         if (!root || typeof window.angular === 'undefined') return false;
                         const scope = angular.element(root).scope();
                         if (!scope || String(scope.job_id || '') !== String(expected)) return false;
+                        const detail = scope.job_detail || {};
                         const node = root.querySelector('[key="job_desc"] .component-input-inner.ng-binding');
-                        return !!node && (node.textContent || '').trim().length > 20;
+                        const text = String(detail.job_desc || (node && node.textContent) || '').trim();
+                        return text.length > 20;
                       }''', item['id'], timeout=8000)
-                      desc = page.locator('.portal-job-detail-pc [key="job_desc"] .component-input-inner.ng-binding').first.text_content().strip()
+                      desc = page.evaluate('''() => {
+                        const root = document.querySelector('.portal-job-detail-pc');
+                        const scope = angular.element(root).scope();
+                        const detail = scope.job_detail || {};
+                        const node = root.querySelector('[key="job_desc"] .component-input-inner.ng-binding');
+                        return String(detail.job_desc || (node && node.textContent) || '').trim();
+                      }''')
                   except Exception as exc:
                       error = f'{type(exc).__name__}: {exc}'
                   elapsed = round(time.perf_counter() - started, 3)
