@@ -4,6 +4,7 @@ from .bambulab import BambuLabAdapter
 from .beisen_zhiye import BeisenZhiyeAdapter
 from .generic_browser import GenericBrowserAdapter
 from .greenhouse import GreenhouseAdapter
+from .haier import HaierCampusAdapter
 from .hcmcloud import HCMCloudAdapter
 from .jobpro_bridge import JobProBridgeAdapter
 from .lever import LeverAdapter
@@ -24,6 +25,7 @@ __all__ = [
     "BeisenZhiyeAdapter",
     "GenericBrowserAdapter",
     "GreenhouseAdapter",
+    "HaierCampusAdapter",
     "HCMCloudAdapter",
     "JobProBridgeAdapter",
     "LeverAdapter",
