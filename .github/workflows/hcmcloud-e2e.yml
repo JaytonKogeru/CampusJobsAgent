@@ -31,7 +31,7 @@ permissions:
 jobs:
   inspur-live:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -48,7 +48,7 @@ jobs:
       - name: Unit tests
         run: pytest tests/test_hcmcloud.py tests/test_generic_browser.py tests/test_detector.py
 
-      - name: Crawl Inspur HCMCloud
+      - name: Crawl and hydrate Inspur HCMCloud
         run: |
           python -m campus_jobs.cli \
             'https://inspur.hcmcloud.cn/recruit#/portal_job_list?job_class=_HB5_Y2FtcHVz&filter_dict=_HB5_eyJf!m9iX2NsYXNzIjoiY2FtcHVzIiwic2VsZWN0X2RlcGFydCI6bnVsbH0%253D' \
@@ -58,9 +58,29 @@ jobs:
             --max-jobs 500 \
             --timeout 45 \
             --out /tmp/inspur-hcmcloud.json
-          cat /tmp/inspur-hcmcloud.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('/tmp/inspur-hcmcloud.json').read_text(encoding='utf-8'))
+          jobs = data.get('jobs') or []
+          print(json.dumps({
+              'adapter': data.get('adapter'),
+              'count': len(jobs),
+              'warnings': data.get('warnings') or [],
+              'sample': [
+                  {
+                      'id': job.get('id'),
+                      'title': job.get('title'),
+                      'url': job.get('url'),
+                      'description_length': len(str(job.get('description') or '')),
+                      'requirements_length': len(str(job.get('requirements') or '')),
+                  }
+                  for job in jobs[:5]
+              ],
+          }, ensure_ascii=False, indent=2))
+          PY
 
-      - name: Validate completeness, native identity and pagination quality
+      - name: Validate completeness, native identity, pagination and detail quality
         run: |
           python - <<'PY'
           import json
@@ -79,6 +99,8 @@ jobs:
                   'pagination click failed',
                   'popup remained visible',
                   'rendered no job rows',
+                  'detail hydration incomplete',
+                  'detail hydration aborted',
               ))
           ]
           ids = [str(job.get('id') or '') for job in jobs]
@@ -96,7 +118,7 @@ jobs:
           assert not bad_detail_urls, f'non-detail HCMCloud urls detected: {bad_detail_urls[:5]}'
           assert len(urls) == len(set(urls)), 'duplicate native detail urls detected'
 
-          core_fields = ('company', 'location', 'function', 'published_at', 'requirements')
+          core_fields = ('company', 'location', 'function', 'published_at', 'requirements', 'description')
           coverage = {
               field: sum(bool(str(job.get(field) or '').strip()) for job in jobs) / len(jobs)
               for field in core_fields
@@ -105,6 +127,16 @@ jobs:
           assert not low_coverage, (
               'serialized field coverage too low: '
               + ', '.join(f'{field}={ratio:.1%}' for field, ratio in low_coverage.items())
+          )
+
+          short_descriptions = [
+              str(job.get('id') or '')
+              for job in jobs
+              if len(str(job.get('description') or '').strip()) <= 20
+          ]
+          assert len(short_descriptions) <= max(1, int(len(jobs) * 0.05)), (
+              f'too many short/unhydrated descriptions: {len(short_descriptions)}/{len(jobs)} '
+              f'sample={short_descriptions[:10]}'
           )
 
           coverage_text = ' '.join(f'{field}={ratio:.1%}' for field, ratio in coverage.items())
