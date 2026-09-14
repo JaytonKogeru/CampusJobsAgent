@@ -26,150 +26,56 @@ jobs:
           python -m pip install -U pip
           pip install -e '.[browser,dev]'
           google-chrome --version || google-chrome-stable --version || chromium --version || true
-      - name: Probe first visible job interaction
+      - name: Probe native row keys and detail routes
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
+          from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
           from playwright.sync_api import sync_playwright
           from campus_jobs.browser_support import chromium_launch_kwargs, dismiss_dynamic_overlays
 
           URL = 'https://inspur.hcmcloud.cn/recruit#/portal_job_list?job_class=_HB5_Y2FtcHVz&filter_dict=_HB5_eyJf!m9iX2NsYXNzIjoiY2FtcHVzIiwic2VsZWN0X2RlcGFydCI6bnVsbH0%253D'
-          report = {
-              'source_url': URL,
-              'requests': [],
-              'responses': [],
-              'pages': [],
-              'before_url': '',
-              'after_url': '',
-              'title_probe': {},
-              'storage_before': {},
-              'storage_after': {},
-          }
-
-          def keep_url(url: str) -> bool:
-              low = url.lower()
-              return any(token in low for token in ('/api/', 'job', 'position', 'recruit', 'portal'))
-
-          def clip(value, n=1200):
-              text = '' if value is None else str(value)
-              return text if len(text) <= n else text[:n] + '...'
+          report = {'source_url': URL, 'samples': []}
 
           with sync_playwright() as p:
               browser = p.chromium.launch(**chromium_launch_kwargs())
               context = browser.new_context(viewport={'width': 1440, 'height': 1000})
               page = context.new_page()
-
-              def on_request(req):
-                  if keep_url(req.url) and len(report['requests']) < 120:
-                      report['requests'].append({
-                          'method': req.method,
-                          'url': req.url,
-                          'post_data': clip(req.post_data, 1800),
-                      })
-
-              def on_response(resp):
-                  if keep_url(resp.url) and len(report['responses']) < 120:
-                      item = {'status': resp.status, 'url': resp.url}
-                      try:
-                          ct = (resp.headers.get('content-type') or '').lower()
-                          if 'json' in ct:
-                              item['json'] = clip(json.dumps(resp.json(), ensure_ascii=False), 2500)
-                      except Exception:
-                          pass
-                      report['responses'].append(item)
-
-              context.on('page', lambda pg: report['pages'].append({'opened_url': pg.url}))
-              page.on('request', on_request)
-              page.on('response', on_response)
               page.goto(URL, wait_until='domcontentloaded', timeout=45000)
               page.wait_for_timeout(2600)
               dismiss_dynamic_overlays(page, max_rounds=6)
               page.wait_for_timeout(1000)
 
-              report['before_url'] = page.url
-              report['storage_before'] = page.evaluate('''() => ({
-                localStorage: Object.fromEntries(Object.entries(localStorage).map(([k,v]) => [k, String(v).slice(0,1200)])),
-                sessionStorage: Object.fromEntries(Object.entries(sessionStorage).map(([k,v]) => [k, String(v).slice(0,1200)]))
-              })''')
-
-              locator = page.get_by_text('软件研发工程师（Java）', exact=True)
-              visible = []
-              for i in range(min(locator.count(), 10)):
-                  item = locator.nth(i)
+              rows = page.locator("[name='portal_job'] .flex-content .table-body .table-row[hcm-key]")
+              report['row_count'] = rows.count()
+              for i in range(min(rows.count(), 6)):
+                  row = rows.nth(i)
+                  key = row.get_attribute('hcm-key') or ''
+                  title = row.locator("[col-key='name'] .cell-content").inner_text().strip()
+                  sample = {'index': i, 'hcm_key': key, 'title': title}
                   try:
-                      if item.is_visible():
-                          visible.append(item)
-                  except Exception:
-                      pass
-              if not visible:
-                  # Fall back to the first visible element whose text is one of the list titles.
-                  candidates = page.locator('body *').filter(has_text='软件研发工程师')
-                  for i in range(min(candidates.count(), 40)):
-                      item = candidates.nth(i)
-                      try:
-                          txt = (item.inner_text() or '').strip()
-                          if item.is_visible() and txt.startswith('软件研发工程师') and len(txt) < 120:
-                              visible.append(item)
-                              break
-                      except Exception:
-                          pass
-
-              if visible:
-                  item = visible[0]
-                  report['title_probe'] = item.evaluate('''(el) => {
-                    const chain = [];
-                    let n = el;
-                    for (let i = 0; i < 8 && n; i++, n = n.parentElement) {
-                      chain.push({
-                        tag: n.tagName,
-                        cls: String(n.className || ''),
-                        id: n.id || '',
-                        role: n.getAttribute('role') || '',
-                        href: n.getAttribute('href') || '',
-                        data: Object.fromEntries([...n.attributes].filter(a => a.name.startsWith('data-')).map(a => [a.name, a.value])),
-                        text: (n.innerText || '').trim().slice(0, 600),
-                        html: n.outerHTML.slice(0, 2200),
-                      });
-                    }
-                    return {chain};
-                  }''')
-
-                  before_req = len(report['requests'])
-                  before_resp = len(report['responses'])
-                  before_pages = len(context.pages)
-                  try:
-                      item.click(timeout=5000, force=True)
+                      with context.expect_page(timeout=6000) as page_info:
+                          row.locator("[col-key='name'] .cell-content").click(timeout=4000, force=True)
+                      detail = page_info.value
+                      detail.wait_for_timeout(500)
+                      sample['detail_url'] = detail.url
+                      detail.close()
+                  except PlaywrightTimeoutError as exc:
+                      sample['error'] = f'no detail page: {exc}'
                   except Exception as exc:
-                      report['click_error'] = f'{type(exc).__name__}: {exc}'
-                  page.wait_for_timeout(2800)
-                  report['after_url'] = page.url
-                  report['new_requests'] = report['requests'][before_req:]
-                  report['new_responses'] = report['responses'][before_resp:]
-                  report['context_pages_after'] = [pg.url for pg in context.pages]
-                  report['new_page_count'] = len(context.pages) - before_pages
-              else:
-                  report['title_probe'] = {'error': 'no visible job title locator'}
-                  report['after_url'] = page.url
+                      sample['error'] = f'{type(exc).__name__}: {exc}'
+                  report['samples'].append(sample)
+                  page.bring_to_front()
+                  page.wait_for_timeout(250)
 
-              report['storage_after'] = page.evaluate('''() => ({
-                localStorage: Object.fromEntries(Object.entries(localStorage).map(([k,v]) => [k, String(v).slice(0,1200)])),
-                sessionStorage: Object.fromEntries(Object.entries(sessionStorage).map(([k,v]) => [k, String(v).slice(0,1200)]))
-              })''')
               browser.close()
 
           Path('/tmp/hcmcloud-native-detail-probe.json').write_text(
               json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8'
           )
-          print(json.dumps({
-              'before_url': report.get('before_url'),
-              'after_url': report.get('after_url'),
-              'new_page_count': report.get('new_page_count'),
-              'new_requests': report.get('new_requests', []),
-              'new_responses': report.get('new_responses', []),
-              'title_probe': report.get('title_probe', {}),
-          }, ensure_ascii=False, indent=2))
+          print(json.dumps(report, ensure_ascii=False, indent=2))
           PY
       - name: Upload probe
         if: always()
