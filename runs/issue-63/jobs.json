@@ -1,0 +1,25 @@
+{
+  "adapter": "generic-browser",
+  "source_url": "https://talent.lenovo.com.cn/position?projectType=1&workPlace=5",
+  "count": 1,
+  "warnings": [
+    "browser final_url=https://talent.lenovo.com.cn/position?projectType=1&workPlace=5; quality=0/1 informative; body_sample=首页\n应届生招聘\n人才项目\n实习生招聘\n了解联想\n相关公司校招\n登录/Login\n查看\n联想官网联想乐享联想学生会员参观联想社会招聘联系我们：chinacampus@lenovo.com\n联想招聘官方社交平台\n版权所有：1998-2022 联想集团法律公告隐私政策产品安全\n京ICP备11035381京公网安备110108007970号",
+    "browser API trace:\n200 GET https://talent.lenovo.com.cn/gateway/proj/status | post=- | dict keys=['code', 'message', 'result']; result:list[3](['projectType', 'activateFlag'])\n200 GET https://talent.lenovo.com.cn/gateway/sysDict/all | post=- | dict keys=['code', 'message', 'result']; result:list[76](['id', 'parentId', 'dictCode', 'dictName', 'dictValue', 'dictSort', 'remark', 'dictEnName', 'isHide', 'children'])\n200 GET https://talent.lenovo.com.cn/gateway/projob/select/1 | post=- | dict keys=['code', 'message', 'result']; result:list[6](['id', 'ids', 'projectId', 'parentId', 'typeName', 'children', 'createTime'])"
+  ],
+  "jobs": [
+    {
+      "id": "https://jobs.lenovo.com/zh_CN/careers",
+      "title": "社会招聘",
+      "url": "https://jobs.lenovo.com/zh_CN/careers",
+      "company": "",
+      "location": "",
+      "department": "",
+      "function": "",
+      "recruit_type": "",
+      "description": "",
+      "requirements": "",
+      "source": "talent.lenovo.com.cn",
+      "published_at": ""
+    }
+  ]
+}
