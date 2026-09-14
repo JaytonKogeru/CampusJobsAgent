@@ -200,7 +200,7 @@ class HaierCampusAdapter(BaseAdapter):
             if response_activity_name:
                 warnings.append(f"selected activity: {response_activity_name} ({activity_id})")
 
-            if options.details and jobs:
+            if options.include_details and jobs:
                 failed: list[str] = []
                 for job in jobs:
                     try:
