@@ -89,23 +89,21 @@ jobs:
           assert all(title and title != '浪潮' for title in titles), titles[:20]
           assert not bad, bad
 
-          core_fields = ('company', 'location', 'function', 'published_at')
-          complete_core = sum(
-              all(str(job.get(field) or '').strip() for field in core_fields)
-              for job in jobs
+          checked_fields = ('company', 'location', 'function', 'published_at', 'requirements')
+          coverage = {
+              field: sum(bool(str(job.get(field) or '').strip()) for job in jobs) / len(jobs)
+              for field in checked_fields
+          }
+          low_coverage = {field: ratio for field, ratio in coverage.items() if ratio < 0.95}
+          assert not low_coverage, (
+              'serialized field coverage too low: '
+              + ', '.join(f'{field}={ratio:.1%}' for field, ratio in low_coverage.items())
           )
-          education_present = sum(
-              bool(str((job.get('extra') or {}).get('education') or '').strip())
-              for job in jobs
-          )
-          core_ratio = complete_core / len(jobs)
-          education_ratio = education_present / len(jobs)
-          assert core_ratio >= 0.95, f'core field coverage too low: {core_ratio:.1%}'
-          assert education_ratio >= 0.95, f'education coverage too low: {education_ratio:.1%}'
 
+          coverage_text = ' '.join(f'{field}={ratio:.1%}' for field, ratio in coverage.items())
           print(
               f"validated adapter=hcmcloud count={len(jobs)} warnings={len(warnings)} "
-              f"core_fields={core_ratio:.1%} education={education_ratio:.1%}"
+              f"{coverage_text}"
           )
           PY
 
