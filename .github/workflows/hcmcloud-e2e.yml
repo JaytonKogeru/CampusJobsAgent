@@ -108,7 +108,7 @@ jobs:
           titles = [str(job.get('title') or '') for job in jobs]
           urls = [str(job.get('url') or '') for job in jobs]
           assert data.get('adapter') == 'hcmcloud', data.get('adapter')
-          assert len(jobs) >= 3, f'suspiciously low count={len(jobs)} warnings={warnings}'
+          assert len(jobs) >= 100, f'Inspur baseline collapsed: count={len(jobs)} warnings={warnings}'
           assert len(ids) == len(set(ids)), 'duplicate job ids detected'
           assert all(title and title != '浪潮' for title in titles), titles[:20]
           assert not bad, bad
