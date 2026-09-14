@@ -8,10 +8,11 @@ from .hcmcloud import HCMCloudAdapter as _HCMCloudAdapter
 class HCMCloudAdapter(_HCMCloudAdapter):
     """HCMCloud adapter with an AngularJS-aware pager driver.
 
-    HCMCloud's ``hc-paging`` directive can update its page-number model without
-    refreshing the job table. For these older portals we drive the job-list
-    controller itself and only accept a transition after the first rendered
-    ``hcm-key`` changes.
+    Older HCMCloud portals expose paging through ``hc-paging``. Its public
+    ``refreshPage(target)`` method is the stable path: it updates the pager's
+    internal page state and calls ``onPagingChange()``, which in turn asks the
+    job-list controller to fetch that page. We only accept the transition after
+    both the visible page number and the first rendered ``hcm-key`` change.
     """
 
     def __init__(self) -> None:
@@ -58,7 +59,7 @@ class HCMCloudAdapter(_HCMCloudAdapter):
         target_page: int,
         previous_key: str,
         *,
-        timeout: int = 12000,
+        timeout: int = 14000,
     ) -> bool:
         try:
             page.wait_for_function(
@@ -83,126 +84,54 @@ class HCMCloudAdapter(_HCMCloudAdapter):
             return False
 
     @staticmethod
-    def _controller_fetch(page, target_page: int) -> dict[str, object]:
-        """Ask the list controller to fetch one explicit page."""
+    def _refresh_page(page, target_page: int) -> dict[str, object]:
+        """Invoke HCMCloud's native pager transition for an explicit page."""
         try:
             result = page.evaluate(
                 r"""
                 (target) => {
+                  const debug = {target, angularFound: !!window.angular, method: ''};
                   const ng = window.angular;
-                  const source = (fn) => typeof fn === 'function'
-                    ? String(fn).replace(/\s+/g, ' ').slice(0, 1800)
-                    : '';
-                  const debug = {
-                    target,
-                    angularFound: !!ng,
-                    method: '',
-                  };
                   if (!ng) return debug;
 
-                  const searchButton = document.querySelector(
-                    '.job-search-bar [ng-click*="fetchData"]'
-                  );
-                  debug.searchButtonFound = !!searchButton;
-                  if (!searchButton) return debug;
-
-                  try {
-                    const wrapped = ng.element(searchButton);
-                    const scopes = [];
-                    if (typeof wrapped.scope === 'function') scopes.push(wrapped.scope());
-                    let parent = scopes[0] && scopes[0].$parent;
-                    for (let depth = 0; parent && depth < 5; depth++, parent = parent.$parent) {
-                      scopes.push(parent);
-                    }
-
-                    for (let index = 0; index < scopes.length; index++) {
-                      const scope = scopes[index];
-                      if (!scope) continue;
-                      const hasPaging = !!scope.paging;
-                      const hasFetchData = typeof scope.fetchData === 'function';
-                      debug[`scope${index}`] = {
-                        hasPaging,
-                        hasFetchData,
-                        currentPage: hasPaging ? scope.paging.current_page : null,
-                        pageCount: hasPaging ? scope.paging.page_count : null,
-                        pageSize: hasPaging ? scope.paging.page_size : null,
-                        fetchDataSource: source(scope.fetchData),
-                        onPagingChangeSource: hasPaging
-                          ? source(scope.paging.onPagingChange) : '',
-                        refreshPageSource: hasPaging
-                          ? source(scope.paging.refreshPage) : '',
-                        canRefreshSource: hasPaging
-                          ? source(scope.paging._canRefresh) : '',
-                      };
-                      if (!hasPaging || !hasFetchData) continue;
-
-                      const run = () => {
-                        scope.paging.current_page = target;
-                        scope.fetchData();
-                      };
-                      if (scope.$$phase) run();
-                      else scope.$apply(run);
-                      debug.method = `job-list.fetchData:scope${index}`;
-                      debug.currentAfter = scope.paging.current_page;
-                      return debug;
-                    }
-                  } catch (error) {
-                    debug.error = String(error && error.message || error);
-                  }
-                  return debug;
-                }
-                """,
-                target_page,
-            )
-            return result if isinstance(result, dict) else {"method": str(result or "")}
-        except Exception as exc:
-            return {
-                "method": "controller-evaluate-error",
-                "error": f"{type(exc).__name__}: {exc}",
-            }
-
-    @staticmethod
-    def _pager_refresh(page, target_page: int) -> dict[str, object]:
-        """Fallback to the pager object's public refresh method."""
-        try:
-            result = page.evaluate(
-                r"""
-                (target) => {
-                  const ng = window.angular;
-                  const source = (fn) => typeof fn === 'function'
-                    ? String(fn).replace(/\s+/g, ' ').slice(0, 1800)
-                    : '';
-                  const debug = {target, angularFound: !!ng, method: ''};
-                  if (!ng) return debug;
                   const button = document.querySelector(
                     `.hc-paging [ng-click*="onPagingClick('next')"]`
                   );
+                  debug.pagerFound = !!button;
                   if (!button) return debug;
+
                   try {
                     const scope = ng.element(button).scope();
+                    debug.scopeFound = !!scope;
+                    debug.hasPaging = !!scope && !!scope.paging;
                     if (!scope || !scope.paging) return debug;
-                    debug.currentBefore = scope.paging.current_page;
-                    debug.pageSize = scope.paging.page_size;
-                    debug.pageCount = scope.paging.page_count;
-                    debug.functions = Object.keys(scope.paging).filter(
-                      (key) => typeof scope.paging[key] === 'function'
-                    );
-                    debug.onPagingClickSource = source(scope.onPagingClick);
-                    debug.onPagingChangeSource = source(scope.paging.onPagingChange);
-                    debug.refreshPageSource = source(scope.paging.refreshPage);
-                    if (typeof scope.paging.refreshPage !== 'function') return debug;
-                    const run = () => {
-                      scope.paging.current_page = target;
-                      scope.paging.refreshPage();
-                    };
+
+                    const paging = scope.paging;
+                    debug.currentBefore = paging.current_page;
+                    debug.internalBefore = paging._current_page;
+                    debug.pageCount = paging.page_count;
+                    debug.pageSize = paging.page_size;
+                    debug.outsideCanRefresh = paging.outsideCanRefresh;
+                    debug.hasRefreshPage = typeof paging.refreshPage === 'function';
+                    debug.hasOnPagingChange = typeof paging.onPagingChange === 'function';
+                    if (typeof paging.refreshPage !== 'function') return debug;
+                    if (target < 1 || target > Number(paging.page_count || 0)) {
+                      debug.method = 'invalid-target';
+                      return debug;
+                    }
+
+                    const run = () => paging.refreshPage(target);
                     if (scope.$$phase) run();
                     else scope.$apply(run);
-                    debug.method = 'paging.refreshPage';
-                    debug.currentAfter = scope.paging.current_page;
+
+                    debug.method = 'paging.refreshPage(target)';
+                    debug.currentAfter = paging.current_page;
+                    debug.internalAfter = paging._current_page;
+                    return debug;
                   } catch (error) {
                     debug.error = String(error && error.message || error);
+                    return debug;
                   }
-                  return debug;
                 }
                 """,
                 target_page,
@@ -210,7 +139,7 @@ class HCMCloudAdapter(_HCMCloudAdapter):
             return result if isinstance(result, dict) else {"method": str(result or "")}
         except Exception as exc:
             return {
-                "method": "pager-evaluate-error",
+                "method": "refresh-evaluate-error",
                 "error": f"{type(exc).__name__}: {exc}",
             }
 
@@ -221,29 +150,29 @@ class HCMCloudAdapter(_HCMCloudAdapter):
             "previousKey": previous_key,
         }
 
-        controller = self._controller_fetch(page, target_page)
-        self._last_pager_debug["controller"] = controller
-        if controller.get("method") and self._wait_for_transition(
-            page,
-            target_page,
-            previous_key,
-            timeout=12000,
-        ):
-            self._last_pager_debug["currentAfter"] = self._pager_page(page)
-            self._last_pager_debug["firstKeyAfter"] = self._first_row_key(page)
-            return str(controller["method"])
+        for attempt in range(2):
+            refresh = self._refresh_page(page, target_page)
+            self._last_pager_debug[f"attempt{attempt + 1}"] = refresh
+            method = str(refresh.get("method") or "")
+            if method == "invalid-target":
+                return ""
+            if method and self._wait_for_transition(
+                page,
+                target_page,
+                previous_key,
+                timeout=14000,
+            ):
+                self._last_pager_debug["currentAfter"] = self._pager_page(page)
+                self._last_pager_debug["firstKeyAfter"] = self._first_row_key(page)
+                return f"hc-paging-refresh:{target_page}"
 
-        refresh = self._pager_refresh(page, target_page)
-        self._last_pager_debug["pagerRefresh"] = refresh
-        if refresh.get("method") and self._wait_for_transition(
-            page,
-            target_page,
-            previous_key,
-            timeout=12000,
-        ):
-            self._last_pager_debug["currentAfter"] = self._pager_page(page)
-            self._last_pager_debug["firstKeyAfter"] = self._first_row_key(page)
-            return str(refresh["method"])
+            # If the portal is still completing the first request, do not issue a
+            # rapid duplicate transition. One bounded settle window keeps paging
+            # deterministic while still allowing a single retry for transient UI
+            # failures.
+            page.wait_for_timeout(1200)
+            if self._pager_page(page) == target_page and self._first_row_key(page) != previous_key:
+                return f"hc-paging-delayed:{target_page}"
 
         self._last_pager_debug["currentFinal"] = self._pager_page(page)
         self._last_pager_debug["firstKeyFinal"] = self._first_row_key(page)
