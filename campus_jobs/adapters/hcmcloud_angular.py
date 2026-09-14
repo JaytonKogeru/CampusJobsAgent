@@ -86,6 +86,11 @@ class HCMCloudAdapter(_HCMCloudAdapter):
                             currentPage: scope.paging ? scope.paging.current_page : null,
                             pageCount: scope.paging ? scope.paging.page_count : null,
                             pageSize: scope.paging ? scope.paging.page_size : null,
+                            pagingFunctions: scope.paging
+                              ? Object.keys(scope.paging).filter(
+                                  (key) => typeof scope.paging[key] === 'function'
+                                )
+                              : [],
                           };
                           debug.scopes.push(entry);
                           if (entry.hasOnPagingClick) {
@@ -119,6 +124,87 @@ class HCMCloudAdapter(_HCMCloudAdapter):
         except Exception as exc:
             return {"method": "evaluate-error", "error": f"{type(exc).__name__}: {exc}"}
 
+    @staticmethod
+    def _trigger_data_refresh(page, target_page: int) -> dict[str, object]:
+        """Run the portal's own data-refresh callback after updating page state."""
+        try:
+            result = page.evaluate(
+                r"""
+                (target) => {
+                  const ng = window.angular;
+                  const debug = {target, angularFound: !!ng, method: ''};
+                  if (!ng) return debug;
+
+                  const pagerButton = document.querySelector(
+                    `.hc-paging [ng-click*="onPagingClick('next')"]`
+                  );
+                  if (pagerButton) {
+                    try {
+                      const scope = ng.element(pagerButton).scope();
+                      if (scope && scope.paging) {
+                        debug.pagingFunctions = Object.keys(scope.paging).filter(
+                          (key) => typeof scope.paging[key] === 'function'
+                        );
+                        const callbackNames = [
+                          'onPagingChange',
+                          'onPageChange',
+                          'onChange',
+                        ];
+                        for (const name of callbackNames) {
+                          if (typeof scope.paging[name] !== 'function') continue;
+                          const run = () => {
+                            scope.paging.current_page = target;
+                            scope.paging[name]();
+                          };
+                          if (scope.$$phase) run();
+                          else scope.$apply(run);
+                          debug.method = `paging.${name}`;
+                          debug.currentAfter = scope.paging.current_page;
+                          return debug;
+                        }
+                      }
+                    } catch (error) {
+                      debug.pagingError = String(error && error.message || error);
+                    }
+                  }
+
+                  // Inspur's job-list controller exposes fetchData() on the same
+                  // scope as the search button. Calling that controller method
+                  // after setting paging.current_page uses the site's own request
+                  // construction/decryption path without depending on its API.
+                  const searchButton = document.querySelector(
+                    '.job-search-bar [ng-click*="fetchData"]'
+                  );
+                  if (searchButton) {
+                    try {
+                      const scope = ng.element(searchButton).scope();
+                      debug.fetchScopeFound = !!scope;
+                      debug.hasFetchData = !!scope && typeof scope.fetchData === 'function';
+                      debug.hasPaging = !!scope && !!scope.paging;
+                      if (scope && scope.paging && typeof scope.fetchData === 'function') {
+                        const run = () => {
+                          scope.paging.current_page = target;
+                          scope.fetchData();
+                        };
+                        if (scope.$$phase) run();
+                        else scope.$apply(run);
+                        debug.method = 'job-list.fetchData';
+                        debug.currentAfter = scope.paging.current_page;
+                        return debug;
+                      }
+                    } catch (error) {
+                      debug.fetchError = String(error && error.message || error);
+                    }
+                  }
+                  return debug;
+                }
+                """,
+                target_page,
+            )
+            return result if isinstance(result, dict) else {"method": str(result or "")}
+        except Exception as exc:
+            return {"method": "refresh-evaluate-error", "error": f"{type(exc).__name__}: {exc}"}
+
     @classmethod
     def _wait_for_target_page(
         cls,
@@ -146,7 +232,7 @@ class HCMCloudAdapter(_HCMCloudAdapter):
 
         if cls._wait_for_row_change(page, previous_key, timeout=timeout):
             return True
-        page.wait_for_timeout(1500)
+        page.wait_for_timeout(1200)
         try:
             first_key = page.evaluate(
                 r"""() => {
@@ -180,7 +266,7 @@ class HCMCloudAdapter(_HCMCloudAdapter):
                 page,
                 target_page,
                 previous_key,
-                timeout=9000,
+                timeout=7000,
             ):
                 self._last_pager_debug["currentAfter"] = self._pager_page(page)
                 return f"hc-paging-{method}:{attempt + 1}"
@@ -188,10 +274,16 @@ class HCMCloudAdapter(_HCMCloudAdapter):
             observed = self._pager_page(page)
             self._last_pager_debug["observedAfterAttempt"] = observed
             if observed == target_page:
-                if self._wait_for_row_change(page, previous_key, timeout=12000):
-                    return f"hc-paging-delayed:{target_page}"
+                refresh = self._trigger_data_refresh(page, target_page)
+                self._last_pager_debug["refresh"] = refresh
+                if refresh.get("method") and self._wait_for_row_change(
+                    page,
+                    previous_key,
+                    timeout=12000,
+                ):
+                    return f"hc-paging-{refresh['method']}:{target_page}"
                 return ""
-            page.wait_for_timeout(1000)
+            page.wait_for_timeout(900)
 
         self._last_pager_debug["currentFinal"] = self._pager_page(page)
         return ""
