@@ -1,0 +1,80 @@
+name: HCMCloud E2E
+
+on:
+  pull_request:
+    paths:
+      - "campus_jobs/adapters/hcmcloud.py"
+      - "campus_jobs/adapters/browser_utils.py"
+      - "campus_jobs/adapters/generic_browser.py"
+      - "campus_jobs/adapters/__init__.py"
+      - "campus_jobs/detector.py"
+      - "tests/test_hcmcloud.py"
+      - ".github/workflows/hcmcloud-e2e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspur-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install crawler and tests
+        run: |
+          python -m pip install -U pip
+          pip install -e '.[dev,browser]'
+          google-chrome --version || google-chrome-stable --version || chromium --version
+
+      - name: Unit tests
+        run: pytest tests/test_hcmcloud.py tests/test_detector.py
+
+      - name: Crawl Inspur public campus jobs
+        env:
+          INSPUR_URL: https://inspur.hcmcloud.cn/recruit#/portal_job_list?job_class=_HB5_Y2FtcHVz&filter_dict=_HB5_eyJf!m9iX2NsYXNzIjoiY2FtcHVzIiwic2VsZWN0X2RlcGFydCI6bnVsbH0%253D
+        run: |
+          python - <<'PY'
+          import json
+          import os
+
+          from campus_jobs.detector import pick_adapter
+          from campus_jobs.models import CrawlOptions
+
+          url = os.environ["INSPUR_URL"]
+          adapter = pick_adapter(url)
+          assert adapter.name == "hcmcloud", adapter.name
+
+          result = adapter.crawl(
+              url,
+              CrawlOptions(
+                  scope="campus",
+                  page_size=50,
+                  max_pages=30,
+                  max_jobs=500,
+                  include_details=False,
+                  timeout=35,
+                  browser_wait_ms=3500,
+              ),
+          )
+          payload = result.to_dict()
+          print(json.dumps({
+              "adapter": payload["adapter"],
+              "count": payload["count"],
+              "warnings": payload["warnings"],
+              "sample": payload["jobs"][:12],
+          }, ensure_ascii=False, indent=2))
+
+          quality_failures = [w for w in result.warnings if w.startswith("QUALITY_FAIL")]
+          assert not result.adapter.endswith("-error"), result.warnings
+          assert not quality_failures, quality_failures
+          assert len(result.jobs) >= 3, f"implausibly small result: {len(result.jobs)}"
+          assert all(job.title != "浪潮" for job in result.jobs)
+          assert len({job.id for job in result.jobs}) == len(result.jobs)
+          assert all("detail" in job.url.lower() for job in result.jobs[:20])
+          PY
