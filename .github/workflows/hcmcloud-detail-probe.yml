@@ -24,80 +24,66 @@ jobs:
         run: |
           python -m pip install -U pip
           pip install -e '.[browser,dev]'
-      - name: Probe detail inside accepted list session
+      - name: Benchmark ten detail hydrations in one SPA session
         run: |
           python - <<'PY'
           import json
+          import statistics
+          import time
           from pathlib import Path
           from playwright.sync_api import sync_playwright
           from campus_jobs.browser_support import chromium_launch_kwargs, dismiss_dynamic_overlays
 
           listing = 'https://inspur.hcmcloud.cn/recruit#/portal_job_list?job_class=_HB5_Y2FtcHVz&filter_dict=_HB5_eyJf!m9iX2NsYXNzIjoiY2FtcHVzIiwic2VsZWN0X2RlcGFydCI6bnVsbH0%253D'
-          report = {'listing': listing, 'api': []}
+          report = {'listing': listing, 'items': []}
           with sync_playwright() as p:
               browser = p.chromium.launch(**chromium_launch_kwargs())
-              page = browser.new_page(viewport={'width': 1440, 'height': 1200})
+              page = browser.new_page(viewport={'width': 1440, 'height': 1000})
+              t0 = time.perf_counter()
               page.goto(listing, wait_until='domcontentloaded', timeout=45000)
-              page.wait_for_timeout(1500)
-              report['dismissed'] = dismiss_dynamic_overlays(page, max_rounds=8)
+              page.wait_for_timeout(1200)
+              dismiss_dynamic_overlays(page, max_rounds=8)
               page.wait_for_selector('.table-row[hcm-key]', state='visible', timeout=25000)
-              first = page.locator('.table-row[hcm-key]').first
-              job_id = first.get_attribute('hcm-key')
-              encoded = page.evaluate('(id) => String(window.hcmUrlParamEncoder(id))', job_id)
-              detail_hash = '#/portal_job_detail?id=' + page.evaluate('(x) => encodeURIComponent(x)', encoded)
-              report['job_id'] = job_id
-              report['detail_hash'] = detail_hash
+              report['list_ready_s'] = round(time.perf_counter() - t0, 3)
+              rows = page.evaluate('''() => [...document.querySelectorAll('.table-body .table-row[hcm-key]')].slice(0, 10).map(row => {
+                const id = String(row.getAttribute('hcm-key') || '');
+                const title = (row.querySelector('.table-cell[col-key="name"] .cell-content')?.innerText || '').trim();
+                const encoded = String(window.hcmUrlParamEncoder(id));
+                return {id, title, hash: '#/portal_job_detail?id=' + encodeURIComponent(encoded)};
+              })''')
 
-              def on_response(resp):
-                  low = resp.url.lower()
-                  if not any(token in low for token in (
-                      'recruit.get.apply.info.by.job',
-                      'rec.choice.get.choice.by.job',
-                      'hcm.model.meta?model=releasejobmgr',
-                  )):
-                      return
-                  item = {'status': resp.status, 'url': resp.url}
+              for item in rows:
+                  started = time.perf_counter()
+                  error = ''
+                  desc = ''
                   try:
-                      item['text'] = resp.text()[:20000]
+                      page.evaluate('(h) => { window.location.hash = h; }', item['hash'])
+                      page.wait_for_function('''expected => {
+                        const root = document.querySelector('.portal-job-detail-pc');
+                        if (!root || typeof window.angular === 'undefined') return false;
+                        const scope = angular.element(root).scope();
+                        if (!scope || String(scope.job_id || '') !== String(expected)) return false;
+                        const node = root.querySelector('[key="job_desc"] .component-input-inner.ng-binding');
+                        return !!node && (node.textContent || '').trim().length > 20;
+                      }''', item['id'], timeout=8000)
+                      desc = page.locator('.portal-job-detail-pc [key="job_desc"] .component-input-inner.ng-binding').first.text_content().strip()
                   except Exception as exc:
-                      item['text_error'] = f'{type(exc).__name__}: {exc}'
-                  report['api'].append(item)
+                      error = f'{type(exc).__name__}: {exc}'
+                  elapsed = round(time.perf_counter() - started, 3)
+                  report['items'].append({**item, 'seconds': elapsed, 'description_length': len(desc), 'has_duties': '职责' in desc, 'has_requirements': '要求' in desc, 'error': error})
 
-              page.on('response', on_response)
-              page.evaluate('(h) => { window.location.hash = h; }', detail_hash)
-              for _ in range(30):
-                  page.wait_for_timeout(400)
-                  dismiss_dynamic_overlays(page, max_rounds=1)
-                  body = page.locator('body').inner_text()
-                  if any(key in body for key in ('岗位职责', '职位职责', '任职要求', '岗位要求', '专业要求')):
-                      break
-
-              report['final_url'] = page.url
-              report['body'] = page.locator('body').inner_text()[:20000]
-              detail = page.locator('.portal-job-detail-pc')
-              report['detail_html'] = detail.inner_html()[:40000] if detail.count() else ''
-              report['scope'] = page.evaluate('''() => {
-                const el = document.querySelector('.portal-job-detail-pc');
-                if (!el || typeof window.angular === 'undefined') return null;
-                let scope = angular.element(el).scope();
-                const out = {};
-                for (let depth = 0; scope && depth < 4; depth++, scope = scope.$parent) {
-                  for (const [k, v] of Object.entries(scope)) {
-                    if (k.startsWith('$') || typeof v === 'function') continue;
-                    try {
-                      const s = JSON.stringify(v);
-                      if (s && s.length < 50000 && /job|apply|position|detail|duty|require|description|content|work|education|background/i.test(k + ' ' + s)) {
-                        out[`d${depth}:${k}`] = JSON.parse(s);
-                      }
-                    } catch (e) {}
-                  }
-                }
-                return out;
-              }''')
+              times = [x['seconds'] for x in report['items'] if not x['error']]
+              report['summary'] = {
+                  'ok': len(times),
+                  'failed': len(report['items']) - len(times),
+                  'mean_s': round(statistics.mean(times), 3) if times else None,
+                  'median_s': round(statistics.median(times), 3) if times else None,
+                  'max_s': max(times) if times else None,
+              }
               browser.close()
 
           Path('/tmp/hcmcloud-detail-probe.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
-          print(json.dumps(report, ensure_ascii=False, indent=2)[:100000])
+          print(json.dumps(report, ensure_ascii=False, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
