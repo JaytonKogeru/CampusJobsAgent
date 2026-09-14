@@ -1,6 +1,11 @@
 name: HCMCloud detail probe
 
 on:
+  push:
+    branches:
+      - feat/hcmcloud-detail-hydration
+    paths:
+      - .github/workflows/hcmcloud-detail-probe.yml
   workflow_dispatch:
 
 permissions:
