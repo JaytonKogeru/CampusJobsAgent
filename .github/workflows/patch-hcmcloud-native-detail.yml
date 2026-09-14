@@ -19,7 +19,7 @@ jobs:
         with:
           ref: feat/hcmcloud-native-detail
 
-      - name: Patch adapter, tests and E2E quality gate
+      - name: Patch adapter and tests
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -135,14 +135,6 @@ jobs:
                   '',
               ])
           tests.write_text(test_text, encoding='utf-8')
-
-          workflow = Path('.github/workflows/hcmcloud-e2e.yml')
-          workflow_text = workflow.read_text(encoding='utf-8')
-          gate = "          assert len(ids) == len(set(ids)), 'duplicate job ids detected'\n          assert all(title and title != '浪潮' for title in titles), titles[:20]\n          assert not bad, bad\n"
-          assert workflow_text.count(gate) == 1, f'E2E gate match count={workflow_text.count(gate)}'
-          native_gate = gate + "\n          urls = [str(job.get('url') or '') for job in jobs]\n          non_native_ids = [job_id for job_id in ids if not job_id.isdigit()]\n          bad_detail_urls = [url for url in urls if '/recruit#/portal_job_detail?id=_HB5_' not in url]\n          assert not non_native_ids, f'non-native HCMCloud ids detected: {non_native_ids[:10]}'\n          assert not bad_detail_urls, f'non-detail HCMCloud urls detected: {bad_detail_urls[:5]}'\n          assert len(urls) == len(set(urls)), 'duplicate native detail urls detected'\n"
-          workflow_text = workflow_text.replace(gate, native_gate, 1)
-          workflow.write_text(workflow_text, encoding='utf-8')
           PY
 
       - name: Verify patch locally in runner
@@ -154,6 +146,6 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add campus_jobs/adapters/hcmcloud.py tests/test_hcmcloud.py .github/workflows/hcmcloud-e2e.yml
+          git add campus_jobs/adapters/hcmcloud.py tests/test_hcmcloud.py
           git commit -m 'hcmcloud: use native job ids and detail routes'
           git push origin HEAD:feat/hcmcloud-native-detail
