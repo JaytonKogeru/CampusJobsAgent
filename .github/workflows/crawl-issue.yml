@@ -60,8 +60,30 @@ jobs:
         run: |
           python -m campus_jobs.issue_runner --event "$CRAWL_EVENT" --output-dir runs > /tmp/run.json
           cat /tmp/run.json
-          COUNT=$(python -c "import json; print(json.load(open('/tmp/run.json', encoding='utf-8'))['count'])")
-          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+
+          data = json.load(open('/tmp/run.json', encoding='utf-8'))
+          count = int(data.get('count') or 0)
+          adapter = str(data.get('adapter') or '')
+          warnings = [str(item) for item in (data.get('warnings') or [])]
+          text = '\n'.join(warnings).lower()
+          degraded_tokens = (
+              'quality=0/',
+              'pagination incomplete',
+              'pagination stalled',
+              'integrity incomplete',
+              'integrity unverified',
+              'detail hydration incomplete',
+              'rendered no job rows',
+              'returned no active',
+          )
+          degraded = count == 0 or adapter.endswith('-error') or any(token in text for token in degraded_tokens)
+          headline = '抓取完成，但结果存在完整性风险，请复核。' if degraded else '抓取完成。'
+          print(f'count={count}')
+          print(f'degraded={str(degraded).lower()}')
+          print(f'headline={headline}')
+          PY
 
       - name: Commit normalized results
         env:
@@ -82,7 +104,11 @@ jobs:
         run: |
           FILE="runs/issue-${ISSUE_NO}/summary.md"
           {
-            echo "抓取完成，共发现 **${{ steps.crawl.outputs.count }}** 个岗位。"
+            echo "${{ steps.crawl.outputs.headline }} 共发现 **${{ steps.crawl.outputs.count }}** 个岗位。"
+            if [ "${{ steps.crawl.outputs.degraded }}" = "true" ]; then
+              echo
+              echo "> ⚠️ 本次结果被自动标记为低质量/不完整，不能直接当作官网全量岗位使用。"
+            fi
             echo
             echo "结果已提交到：\`runs/issue-${ISSUE_NO}/jobs.json\`"
             echo
