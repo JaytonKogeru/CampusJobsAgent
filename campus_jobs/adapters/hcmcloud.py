@@ -520,6 +520,7 @@ class HCMCloudAdapter(BaseAdapter):
             recruit_type=recruit_type,
             source=urlparse(source_url).netloc,
             published_at=published_at,
+            requirements=education,
             extra={
                 "list_text": text,
                 "education": education,
