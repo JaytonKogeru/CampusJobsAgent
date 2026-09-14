@@ -1,0 +1,123 @@
+name: Haier E2E
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "campus_jobs/adapters/haier.py"
+      - "campus_jobs/detector.py"
+      - "campus_jobs/adapters/__init__.py"
+      - "tests/test_haier.py"
+      - "tests/test_detector.py"
+      - ".github/workflows/haier-e2e.yml"
+  push:
+    branches:
+      - "feat/**"
+    paths:
+      - "campus_jobs/adapters/haier.py"
+      - "campus_jobs/detector.py"
+      - "campus_jobs/adapters/__init__.py"
+      - "tests/test_haier.py"
+      - "tests/test_detector.py"
+      - ".github/workflows/haier-e2e.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  haier-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install crawler
+        run: |
+          python -m pip install -U pip
+          pip install -e '.[dev]'
+
+      - name: Unit tests
+        run: pytest tests/test_haier.py tests/test_detector.py tests/test_generic_browser.py
+
+      - name: Crawl full Haier 2027 list through native API
+        run: |
+          python -m campus_jobs.cli \
+            'https://maker.haier.net/client/campus/activityindex.html' \
+            --scope campus \
+            --page-size 50 \
+            --max-pages 10 \
+            --max-jobs 300 \
+            --no-details \
+            --timeout 45 \
+            --out /tmp/haier-list.json
+
+      - name: Crawl and hydrate Haier AI jobs
+        run: |
+          python -m campus_jobs.cli \
+            'https://maker.haier.net/client/campus/activityindex.html' \
+            --keyword AI \
+            --scope campus \
+            --page-size 50 \
+            --max-pages 10 \
+            --max-jobs 100 \
+            --timeout 45 \
+            --out /tmp/haier-ai.json
+
+      - name: Validate native pagination and detail quality
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          full = json.loads(Path('/tmp/haier-list.json').read_text(encoding='utf-8'))
+          ai = json.loads(Path('/tmp/haier-ai.json').read_text(encoding='utf-8'))
+          jobs = full.get('jobs') or []
+          warnings = full.get('warnings') or []
+
+          assert full.get('adapter') == 'haier-campus', full.get('adapter')
+          assert len(jobs) >= 80, f'Haier active-campus baseline collapsed: count={len(jobs)} warnings={warnings}'
+          assert not any('pagination incomplete' in warning.lower() for warning in warnings), warnings
+          assert not any('pagination stalled' in warning.lower() for warning in warnings), warnings
+
+          ids = [str(job.get('id') or '') for job in jobs]
+          urls = [str(job.get('url') or '') for job in jobs]
+          assert len(ids) == len(set(ids)), 'duplicate Haier job ids detected'
+          assert all(job_id.isdigit() for job_id in ids), ids[:10]
+          assert all('/client/campus/' in url and '/rid/' in url for url in urls), urls[:10]
+
+          metadata_fields = ('location', 'department', 'function')
+          coverage = {
+              field: sum(bool(str(job.get(field) or '').strip()) for job in jobs) / len(jobs)
+              for field in metadata_fields
+          }
+          assert coverage['location'] >= 0.90, coverage
+          assert coverage['function'] >= 0.90, coverage
+
+          ai_jobs = ai.get('jobs') or []
+          assert ai.get('adapter') == 'haier-campus', ai.get('adapter')
+          assert len(ai_jobs) >= 3, f'Haier AI keyword crawl returned too few jobs: {len(ai_jobs)}'
+          description_ratio = sum(bool(str(job.get('description') or '').strip()) for job in ai_jobs) / len(ai_jobs)
+          requirement_ratio = sum(bool(str(job.get('requirements') or '').strip()) for job in ai_jobs) / len(ai_jobs)
+          assert description_ratio >= 0.80, f'description coverage={description_ratio:.1%}'
+          assert requirement_ratio >= 0.80, f'requirement coverage={requirement_ratio:.1%}'
+          assert not any('detail hydration incomplete' in warning.lower() for warning in (ai.get('warnings') or []))
+
+          print(
+              f"validated adapter=haier-campus full_count={len(jobs)} ai_count={len(ai_jobs)} "
+              f"metadata={coverage} descriptions={description_ratio:.1%} requirements={requirement_ratio:.1%}"
+          )
+          PY
+
+      - name: Upload live results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: haier-live-results
+          path: |
+            /tmp/haier-list.json
+            /tmp/haier-ai.json
+          if-no-files-found: warn
