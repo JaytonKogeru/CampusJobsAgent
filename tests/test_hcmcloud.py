@@ -8,7 +8,9 @@ def test_hcmcloud_detection():
     assert HCMCloudAdapter.can_handle(url)
     assert HCMCloudAdapter.can_handle("https://example.hcmcloud.cn/recruit")
     assert not HCMCloudAdapter.can_handle("https://example.com/recruit")
-    assert pick_adapter(url).name == "hcmcloud"
+    adapter = pick_adapter(url)
+    assert adapter.name == "hcmcloud"
+    assert adapter.__class__.__module__.endswith("hcmcloud_angular")
 
 
 def test_hcmcloud_total_hint():
