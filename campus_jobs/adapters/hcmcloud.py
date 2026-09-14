@@ -220,6 +220,60 @@ _ID_PATTERNS = (
 
 _SEMANTIC_HEADERS = ["职位名称", "所属单位", "工作城市", "学历要求", "发布时间", "职位类别"]
 _DATE_RE = re.compile(r"^\d{4}-\d{1,2}-\d{1,2}$")
+_DETAIL_REQUIREMENT_RE = re.compile(
+    r"(?im)(?:^|\n)\s*(任职要求|岗位要求|职位要求|任职资格|任职条件|资格要求|招聘要求)\s*[：:]?\s*"
+)
+_DETAIL_READY_JS = r"""
+expected => {
+  const root = document.querySelector('.portal-job-detail-pc');
+  if (!root || typeof window.angular === 'undefined') return false;
+  const scope = angular.element(root).scope();
+  if (!scope || String(scope.job_id || '') !== String(expected)) return false;
+  const detail = scope.job_detail || {};
+  const node = root.querySelector('[key="job_desc"] .component-input-inner.ng-binding');
+  const text = String(detail.job_desc || (node && node.textContent) || '').trim();
+  return text.length > 20;
+}
+"""
+_DETAIL_EXTRACT_JS = r"""
+() => {
+  const root = document.querySelector('.portal-job-detail-pc');
+  if (!root || typeof window.angular === 'undefined') return {};
+  const scope = angular.element(root).scope();
+  const detail = (scope && scope.job_detail) || {};
+  const scalar = (value) => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return String(value).trim();
+    }
+    if (Array.isArray(value)) return value.map(scalar).filter(Boolean).join('、');
+    if (typeof value === 'object') {
+      for (const key of ['name', 'label', 'text', 'display_name', 'value']) {
+        const candidate = scalar(value[key]);
+        if (candidate) return candidate;
+      }
+    }
+    return '';
+  };
+  const dom = (key) => {
+    const node = root.querySelector(`[key="${key}"] .component-input-inner.ng-binding`);
+    return node ? String(node.textContent || '').trim() : '';
+  };
+  const value = (key) => scalar(detail[key]) || dom(key);
+  return {
+    job_id: String((scope && scope.job_id) || detail.id || ''),
+    job_desc: value('job_desc'),
+    professional: value('professional'),
+    recruit_number: value('recruit_number'),
+    work_exp: value('work_exp'),
+    work_address: value('work_address'),
+    background: value('background'),
+    department: value('department')
+  };
+}
+"""
+_DETAIL_WORKERS = 4
+_DETAIL_MAX_CONSECUTIVE_FAILURES = 8
 
 
 class HCMCloudAdapter(BaseAdapter):
@@ -529,6 +583,172 @@ class HCMCloudAdapter(BaseAdapter):
         # official route in href; do not fabricate an unverified id parameter.
         return source_url
 
+    @staticmethod
+    def _requirements_from_detail(
+        description: str,
+        education: str = "",
+        professional: str = "",
+    ) -> str:
+        description = clean_text(description)
+        education = clean_text(education)
+        professional = clean_text(professional)
+        requirement = ""
+        match = _DETAIL_REQUIREMENT_RE.search(description)
+        if match:
+            body = clean_text(description[match.end() :])
+            if body:
+                requirement = f"{match.group(1)}：\n{body}"
+
+        pieces: list[str] = []
+        if education and education not in requirement:
+            pieces.append(f"学历要求：{education}")
+        if professional and professional not in requirement:
+            pieces.append(f"专业要求：{professional}")
+        if requirement:
+            pieces.append(requirement)
+        return "\n".join(pieces) or education
+
+    def _hydrate_details(
+        self,
+        page,
+        source_url: str,
+        values: list[Job],
+        options: CrawlOptions,
+        warnings: list[str],
+    ) -> None:
+        targets = [
+            job
+            for job in values
+            if not job.id.startswith("dom-")
+            and "portal_job_detail" in job.url
+            and urlparse(job.url).fragment
+        ]
+        if not targets:
+            return
+
+        detail_timeout_ms = min(max(int(options.browser_wait_ms * 3), 6000), 10000)
+        init_timeout_ms = min(max(int(options.timeout * 1000), 10000), 30000)
+        workers = [page]
+        candidates = []
+        for _ in range(min(_DETAIL_WORKERS, len(targets)) - 1):
+            worker = page.context.new_page()
+            try:
+                worker.goto(source_url, wait_until="commit", timeout=init_timeout_ms)
+                candidates.append(worker)
+            except Exception:
+                worker.close()
+
+        for worker in candidates:
+            try:
+                worker.wait_for_function(
+                    "() => typeof window.angular !== 'undefined'",
+                    timeout=12000,
+                )
+                dismiss_dynamic_overlays(worker, max_rounds=3)
+                workers.append(worker)
+            except Exception:
+                worker.close()
+
+        failures: list[str] = []
+        hydrated = 0
+        consecutive_failures = 0
+        max_failures = max(8, min(24, (len(targets) + 9) // 10))
+        aborted = False
+
+        try:
+            for start in range(0, len(targets), len(workers)):
+                batch = targets[start : start + len(workers)]
+                assignments = []
+                for worker, job in zip(workers, batch, strict=False):
+                    error = ""
+                    try:
+                        fragment = urlparse(job.url).fragment
+                        worker.evaluate(
+                            "fragment => { window.location.hash = '#' + fragment; }",
+                            fragment,
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        error = f"navigate {type(exc).__name__}: {exc}"
+                    assignments.append((worker, job, error))
+
+                batch_results: list[bool] = []
+                for worker, job, error in assignments:
+                    if not error:
+                        try:
+                            worker.wait_for_function(
+                                _DETAIL_READY_JS,
+                                arg=job.id,
+                                timeout=detail_timeout_ms,
+                            )
+                            payload = worker.evaluate(_DETAIL_EXTRACT_JS)
+                            if not isinstance(payload, dict):
+                                raise RuntimeError("detail extractor returned no object")
+                            detail_id = clean_text(payload.get("job_id"))
+                            if detail_id and detail_id != job.id:
+                                raise RuntimeError(f"detail id mismatch: {detail_id}")
+                            description = clean_text(payload.get("job_desc"))
+                            if len(description) <= 20:
+                                raise RuntimeError("detail description was empty or too short")
+
+                            professional = clean_text(payload.get("professional"))
+                            education = clean_text(job.extra.get("education"))
+                            job.description = description
+                            job.requirements = self._requirements_from_detail(
+                                description,
+                                education,
+                                professional,
+                            )
+                            department = clean_text(payload.get("department"))
+                            if department and not job.department:
+                                job.department = department
+                            job.extra.update(
+                                {
+                                    "detail_hydrated": True,
+                                    "professional": professional,
+                                    "recruit_number": clean_text(payload.get("recruit_number")),
+                                    "work_exp": clean_text(payload.get("work_exp")),
+                                    "work_address": clean_text(payload.get("work_address")),
+                                    "detail_background": clean_text(payload.get("background")),
+                                }
+                            )
+                            hydrated += 1
+                            batch_results.append(True)
+                            continue
+                        except Exception as exc:  # noqa: BLE001
+                            error = f"{type(exc).__name__}: {exc}"
+
+                    failures.append(f"{job.id}:{error[:180]}")
+                    batch_results.append(False)
+
+                for ok in batch_results:
+                    consecutive_failures = 0 if ok else consecutive_failures + 1
+
+                if (
+                    consecutive_failures >= _DETAIL_MAX_CONSECUTIVE_FAILURES
+                    or len(failures) >= max_failures
+                ):
+                    warnings.append(
+                        "detail hydration aborted: "
+                        f"hydrated {hydrated}/{len(targets)}; failures={len(failures)}; "
+                        f"consecutive={consecutive_failures}; workers={len(workers)}"
+                    )
+                    aborted = True
+                    break
+        finally:
+            for worker in workers[1:]:
+                try:
+                    worker.close()
+                except Exception:
+                    pass
+
+        if hydrated < len(targets):
+            sample = "; ".join(failures[:5]) or "unattempted after abort"
+            warnings.append(
+                "detail hydration incomplete: "
+                f"hydrated {hydrated}/{len(targets)}; failed={len(failures)}; "
+                f"workers={len(workers)}; aborted={aborted}; sample={sample}"
+            )
+
     def _normalize_row(
         self,
         source_url: str,
@@ -733,9 +953,11 @@ class HCMCloudAdapter(BaseAdapter):
             except Exception:
                 popup_visible = False
 
-            browser.close()
+            values = list(jobs.values())[: options.max_jobs]
+            if options.include_details and values:
+                self._hydrate_details(page, url, values, options, warnings)
 
-        values = list(jobs.values())[: options.max_jobs]
+            browser.close()
         if popup_visible:
             warnings.append("dynamic consent popup remained visible after dismissal attempts")
 

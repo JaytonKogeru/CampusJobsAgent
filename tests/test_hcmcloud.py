@@ -112,3 +112,29 @@ def test_native_detail_href_is_preserved():
         row,
         "59959",
     ) == "https://inspur.hcmcloud.cn/recruit#/portal_job_detail?id=_HB5_NTkaNTk%253D"
+
+
+def test_detail_requirements_extracts_requirement_section():
+    description = """岗位职责：
+1、完成开发任务。
+任职要求：
+1、本科及以上学历，计算机相关专业；
+2、熟悉 Java。"""
+    requirements = HCMCloudAdapter._requirements_from_detail(
+        description,
+        "本科及以上",
+        "计算机相关专业",
+    )
+    assert "岗位职责" not in requirements
+    assert "任职要求：" in requirements
+    assert "熟悉 Java" in requirements
+    assert requirements.count("本科及以上") == 1
+
+
+def test_detail_requirements_falls_back_to_list_metadata():
+    requirements = HCMCloudAdapter._requirements_from_detail(
+        "负责产品研发和项目支持。",
+        "硕士及以上",
+        "计算机类",
+    )
+    assert requirements == "学历要求：硕士及以上\n专业要求：计算机类"
