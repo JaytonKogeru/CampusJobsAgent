@@ -1,0 +1,45 @@
+name: One-shot HCMCloud explicit context patch
+
+on:
+  push:
+    branches:
+      - feat/hcmcloud-detail-hydration
+    paths:
+      - .github/workflows/patch-hcmcloud-context.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/hcmcloud-detail-hydration
+      - name: Use an explicit browser context
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('campus_jobs/adapters/hcmcloud.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''            browser = p.chromium.launch(**chromium_launch_kwargs())
+                      page = browser.new_page(viewport={"width": 1440, "height": 1000})
+          '''.replace('          ', '')
+          new = '''            browser = p.chromium.launch(**chromium_launch_kwargs())
+                      context = browser.new_context(viewport={"width": 1440, "height": 1000})
+                      page = context.new_page()
+          '''.replace('          ', '')
+          assert text.count(old) == 1, f'context anchor count={text.count(old)}'
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+          python -m compileall -q campus_jobs tests
+          git diff --check
+      - name: Commit code only
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add campus_jobs/adapters/hcmcloud.py
+          git commit -m 'hcmcloud: use explicit browser context for detail workers'
+          git push origin HEAD:feat/hcmcloud-detail-hydration
