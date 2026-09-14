@@ -24,8 +24,7 @@ jobs:
         run: |
           python -m pip install -U pip
           pip install -e '.[browser,dev]'
-          google-chrome --version || google-chrome-stable --version || chromium --version || true
-      - name: Probe detail pages
+      - name: Probe detail response and Angular scope
         run: |
           python - <<'PY'
           import json
@@ -33,52 +32,76 @@ jobs:
           from playwright.sync_api import sync_playwright
           from campus_jobs.browser_support import chromium_launch_kwargs, dismiss_dynamic_overlays
 
-          urls = [
-              'https://inspur.hcmcloud.cn/recruit#/portal_job_detail?id=_HB5_NTkaNTk%253D',
-              'https://inspur.hcmcloud.cn/recruit#/portal_job_detail?id=_HB5_NjAzNTQ%253D',
-              'https://inspur.hcmcloud.cn/recruit#/portal_job_detail?id=_HB5_NTkaNDg%253D',
-          ]
-          report = []
+          target = 'https://inspur.hcmcloud.cn/recruit#/portal_job_detail?id=_HB5_NTkaNTk%253D'
+          report = {'target': target, 'api': []}
+
           with sync_playwright() as p:
               browser = p.chromium.launch(**chromium_launch_kwargs())
               context = browser.new_context(viewport={'width': 1440, 'height': 1200})
-              for target in urls:
-                  page = context.new_page()
-                  requests = []
-                  responses = []
-                  page.on('request', lambda req: requests.append({'method': req.method, 'url': req.url, 'post_data': req.post_data}) if '/api/' in req.url.lower() and len(requests) < 80 else None)
-                  page.on('response', lambda resp: responses.append({'status': resp.status, 'url': resp.url}) if '/api/' in resp.url.lower() and len(responses) < 80 else None)
+              page = context.new_page()
+
+              def on_response(resp):
+                  low = resp.url.lower()
+                  if not any(token in low for token in (
+                      'recruit.get.apply.info.by.job',
+                      'rec.choice.get.choice.by.job',
+                      'hcm.model.meta?model=releasejobmgr',
+                  )):
+                      return
+                  item = {'status': resp.status, 'url': resp.url}
                   try:
-                      page.goto(target, wait_until='domcontentloaded', timeout=45000)
+                      item['text'] = resp.text()[:12000]
                   except Exception as exc:
-                      print('navigation', type(exc).__name__, exc)
-                  page.wait_for_timeout(1800)
-                  dismiss_dynamic_overlays(page, max_rounds=6)
-                  page.wait_for_timeout(1800)
-                  body = page.locator('body').inner_text()
-                  interesting = page.evaluate('''() => [...document.querySelectorAll('*')]
-                    .filter(el => {
-                      const t = (el.innerText || '').trim();
-                      if (!t || t.length > 1800) return false;
-                      const s = `${el.className || ''} ${el.id || ''}`.toLowerCase();
-                      return /job|position|detail|require|duty|desc|content|condition|qualification|职责|要求|任职|岗位|专业/.test(`${s} ${t}`);
-                    })
-                    .slice(0, 120)
-                    .map(el => ({tag: el.tagName, cls: String(el.className || ''), id: el.id || '', text: (el.innerText || '').trim()}));''')
-                  report.append({
-                      'target': target,
-                      'final_url': page.url,
-                      'title': page.title(),
-                      'body': body[:12000],
-                      'interesting': interesting,
-                      'requests': requests,
-                      'responses': responses,
-                  })
-                  page.close()
+                      item['text_error'] = f'{type(exc).__name__}: {exc}'
+                  report['api'].append(item)
+
+              page.on('response', on_response)
+              page.goto(target, wait_until='domcontentloaded', timeout=45000)
+              page.wait_for_timeout(1200)
+              for text in ('我已阅读并同意', '同意并继续', '接受并继续'):
+                  try:
+                      loc = page.get_by_text(text, exact=True)
+                      if loc.count() and loc.first.is_visible():
+                          loc.first.click(timeout=2500, force=True)
+                          page.wait_for_timeout(800)
+                  except Exception:
+                      pass
+              dismiss_dynamic_overlays(page, max_rounds=6)
+
+              for _ in range(20):
+                  page.wait_for_timeout(500)
+                  try:
+                      body = page.locator('body').inner_text()
+                  except Exception:
+                      body = ''
+                  if any(key in body for key in ('岗位职责', '职位职责', '任职要求', '岗位要求', '专业要求')):
+                      break
+
+              report['final_url'] = page.url
+              report['body'] = page.locator('body').inner_text()[:16000]
+              report['detail_html'] = page.locator('.portal-job-detail-pc').inner_html()[:30000] if page.locator('.portal-job-detail-pc').count() else ''
+              report['scope'] = page.evaluate('''() => {
+                const el = document.querySelector('.portal-job-detail-pc');
+                if (!el || typeof window.angular === 'undefined') return null;
+                const scope = angular.element(el).scope();
+                if (!scope) return null;
+                const out = {};
+                for (const [k, v] of Object.entries(scope)) {
+                  if (k.startsWith('$') || typeof v === 'function') continue;
+                  try {
+                    const s = JSON.stringify(v);
+                    if (s && s.length < 30000 && /job|apply|position|detail|duty|require|description|content/i.test(k + ' ' + s)) {
+                      out[k] = JSON.parse(s);
+                    }
+                  } catch (e) {}
+                }
+                return out;
+              }''')
               browser.close()
+
           out = Path('/tmp/hcmcloud-detail-probe.json')
           out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
-          print(json.dumps(report, ensure_ascii=False, indent=2)[:50000])
+          print(json.dumps(report, ensure_ascii=False, indent=2)[:80000])
           PY
       - uses: actions/upload-artifact@v4
         if: always()
