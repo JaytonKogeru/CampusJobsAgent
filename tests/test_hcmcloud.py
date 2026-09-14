@@ -138,3 +138,14 @@ def test_detail_requirements_falls_back_to_list_metadata():
         "计算机类",
     )
     assert requirements == "学历要求：硕士及以上\n专业要求：计算机类"
+
+
+def test_first_page_default_pager_is_not_terminal():
+    assert HCMCloudAdapter._metadata_terminal_reason(0, None, 1, 20) is None
+    assert HCMCloudAdapter._metadata_terminal_reason(0, 20, 1, 20) is None
+
+
+def test_metadata_terminal_reason_respects_real_page_count():
+    assert HCMCloudAdapter._metadata_terminal_reason(0, 186, 10, 20) is None
+    assert HCMCloudAdapter._metadata_terminal_reason(9, 186, 10, 186) == "upstream-total"
+    assert HCMCloudAdapter._metadata_terminal_reason(9, None, 10, 186) == "terminal"

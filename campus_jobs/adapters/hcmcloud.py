@@ -320,6 +320,26 @@ class HCMCloudAdapter(BaseAdapter):
         return None
 
     @staticmethod
+    def _metadata_terminal_reason(
+        page_index: int,
+        expected_total: int | None,
+        expected_pages: int | None,
+        job_count: int,
+    ) -> str | None:
+        page_number = page_index + 1
+        # HCMCloud can briefly render a default "1 page" pager before
+        # the async total/page metadata arrives. Never trust that first
+        # page as terminal; force at least one real paging attempt.
+        if page_index == 0 and (expected_pages is None or expected_pages <= 1):
+            return None
+        if expected_total is not None and job_count >= expected_total:
+            if expected_pages is None or page_number >= expected_pages:
+                return "upstream-total"
+        if expected_pages is not None and page_number >= expected_pages:
+            return "terminal"
+        return None
+
+    @staticmethod
     def _semantic_rows_from_text(text: str) -> list[dict[str, object]]:
         """Parse div-based HCMCloud grids from their stable six-column text contract."""
         lines = [clean_text(line) for line in (text or "").splitlines() if clean_text(line)]
@@ -867,6 +887,24 @@ class HCMCloudAdapter(BaseAdapter):
                 dismiss_dynamic_overlays(page, max_rounds=2)
                 page.wait_for_timeout(400)
 
+            # Rows often render before HCMCloud's async total/pager metadata.
+            # Give the control plane a short stabilization window before deciding
+            # whether page 1 is terminal.
+            for _ in range(20):
+                try:
+                    metadata_text = clean_text(page.locator("body").inner_text())
+                except Exception:
+                    metadata_text = ""
+                total = self._expected_total(metadata_text)
+                if total is not None:
+                    expected_total = max(expected_total or 0, total)
+                page_total = self._expected_pages(metadata_text)
+                if page_total is not None:
+                    expected_pages = max(expected_pages or 0, page_total)
+                if expected_total is not None or (expected_pages or 0) > 1:
+                    break
+                page.wait_for_timeout(300)
+
             signatures: set[str] = set()
             for page_index in range(options.max_pages):
                 pages_seen = page_index + 1
@@ -908,11 +946,14 @@ class HCMCloudAdapter(BaseAdapter):
                 if len(jobs) >= options.max_jobs:
                     break
 
-                if expected_total is not None and len(jobs) >= expected_total:
-                    pagination_reason = "upstream-total"
-                    break
-                if expected_pages is not None and page_index + 1 >= expected_pages:
-                    pagination_reason = "terminal"
+                terminal_reason = self._metadata_terminal_reason(
+                    page_index,
+                    expected_total,
+                    expected_pages,
+                    len(jobs),
+                )
+                if terminal_reason:
+                    pagination_reason = terminal_reason
                     break
 
                 before_signature = signature
@@ -962,7 +1003,19 @@ class HCMCloudAdapter(BaseAdapter):
         if popup_visible:
             warnings.append("dynamic consent popup remained visible after dismissal attempts")
 
-        if expected_total is not None and not options.keyword:
+        first_page_unverified = (
+            not options.keyword
+            and pages_seen == 1
+            and pagination_reason == "no-next-control"
+            and (expected_pages is None or expected_pages <= 1)
+        )
+        if first_page_unverified:
+            warnings.append(
+                "integrity unverified: HCMCloud ended on the first rendered page "
+                f"without stable multi-page evidence; jobs={len(values)}, "
+                f"upstream total={expected_total}, expected_pages={expected_pages}"
+            )
+        elif expected_total is not None and not options.keyword:
             target = min(expected_total, options.max_jobs)
             if len(values) < target:
                 warnings.append(
@@ -970,6 +1023,11 @@ class HCMCloudAdapter(BaseAdapter):
                     f"(upstream total={expected_total}, expected_pages={expected_pages}, "
                     f"reason={pagination_reason}, method={pagination_method or '-'}, pages={pages_seen})"
                 )
+        elif not options.keyword and expected_total is None and expected_pages is None:
+            warnings.append(
+                "integrity unverified: upstream total and page count were unavailable; "
+                f"reason={pagination_reason}, jobs={len(values)}, pages={pages_seen}"
+            )
         elif pagination_reason in {"stalled", "no-next-control", "repeated-page", "max-pages"}:
             warnings.append(
                 f"integrity unverified: pagination ended with reason={pagination_reason}, "
