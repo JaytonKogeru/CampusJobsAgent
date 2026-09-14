@@ -7,6 +7,7 @@ from .adapters import (
     BeisenZhiyeAdapter,
     GenericBrowserAdapter,
     GreenhouseAdapter,
+    HCMCloudAdapter,
     JobProBridgeAdapter,
     LeverAdapter,
     MideaCampusAdapter,
@@ -23,6 +24,7 @@ from .adapters import (
 ADAPTERS = sorted(
     [
         QQDocsSourceAdapter,
+        HCMCloudAdapter,
         BambuLabAdapter,
         MideaCampusAdapter,
         MokaAdapter,

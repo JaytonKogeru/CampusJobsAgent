@@ -1,21 +1,24 @@
 from __future__ import annotations
 
 import json
-import os
 import re
-import shutil
 from urllib.parse import urlparse
 
+from campus_jobs.browser_support import chromium_launch_kwargs, dismiss_dynamic_overlays
 from campus_jobs.models import CrawlOptions, CrawlResult, Job
 from campus_jobs.utils import assert_public_url, canonical_url, clean_text, find_first, walk_dicts
+
 from .base import BaseAdapter
 
 TITLE_KEYS = ["title", "name", "jobName", "job_name", "positionName", "jobTitle", "postName", "RecruitPostName"]
+JOB_TITLE_KEYS = ["jobName", "job_name", "positionName", "jobTitle", "postName", "RecruitPostName"]
 URL_KEYS = ["url", "href", "jobUrl", "job_url", "applyUrl", "positionUrl", "PostURL"]
 ID_KEYS = ["id", "jobId", "job_id", "postId", "positionId", "JobAdId"]
+JOB_ID_KEYS = ["jobId", "job_id", "postId", "positionId", "JobAdId"]
 LOC_KEYS = ["location", "city", "workPlace", "workLocation", "workCity", "LocationName", "workPlaceStr"]
 DESC_KEYS = ["description", "jobDescription", "duty", "Duty", "workContent", "responsibility"]
 REQ_KEYS = ["requirement", "requirements", "Require", "serviceCondition", "qualification"]
+JOBISH_KEYS = set(JOB_TITLE_KEYS + JOB_ID_KEYS + LOC_KEYS + DESC_KEYS + REQ_KEYS)
 
 
 def _json_shape(data: object) -> str:
@@ -51,6 +54,20 @@ def _json_shape(data: object) -> str:
         return type(data).__name__
 
 
+def _looks_like_job_object(obj: dict, raw_url: str) -> bool:
+    """Require job-specific evidence before synthesizing a job from generic JSON.
+
+    Dynamic applications routinely return objects such as ``{id: 8, name: '浪潮'}``
+    in auth/config responses. Treating every ``id + name`` pair as a job creates
+    convincing false positives, so generic keys alone are deliberately insufficient.
+    """
+    if any(key in obj and obj.get(key) not in (None, "", [], {}) for key in JOBISH_KEYS):
+        return True
+    if raw_url and re.search(r"job|position|career|recruit|招聘|职位|岗位", raw_url, re.I):
+        return True
+    return False
+
+
 class GenericBrowserAdapter(BaseAdapter):
     name = "generic-browser"
     priority = 1
@@ -79,6 +96,8 @@ class GenericBrowserAdapter(BaseAdapter):
                     continue
                 jid = clean_text(find_first(obj, ID_KEYS))
                 raw_url = clean_text(find_first(obj, URL_KEYS))
+                if not _looks_like_job_object(obj, raw_url):
+                    continue
                 job_url = canonical_url(raw_url, base_url) if raw_url else ""
                 if not job_url and jid:
                     job_url = f"{url}#job={jid}"
@@ -99,24 +118,16 @@ class GenericBrowserAdapter(BaseAdapter):
                 )
 
         with sync_playwright() as p:
-            launch_kwargs: dict[str, object] = {"headless": True}
-            chrome = next(
-                (path for path in [shutil.which("google-chrome"), shutil.which("google-chrome-stable"), shutil.which("chromium"), shutil.which("chromium-browser")] if path),
-                None,
-            )
-            if chrome:
-                launch_kwargs["executable_path"] = chrome
-            proxy = os.getenv("CAMPUS_JOBS_PROXY", "").strip()
-            if proxy:
-                launch_kwargs["proxy"] = {"server": proxy}
-            browser = p.chromium.launch(**launch_kwargs)
+            browser = p.chromium.launch(**chromium_launch_kwargs())
             page = browser.new_page(viewport={"width": 1440, "height": 1000})
 
             def on_response(response):
                 try:
                     ct = (response.headers.get("content-type") or "").lower()
                     low = response.url.lower()
-                    looks_relevant = "json" in ct or any(x in low for x in ["job", "position", "post", "recruit", "career", "school", "campus", "zhaopin"])
+                    looks_relevant = "json" in ct or any(
+                        x in low for x in ["job", "position", "post", "recruit", "career", "school", "campus", "zhaopin"]
+                    )
                     if not looks_relevant:
                         return
                     try:
@@ -151,23 +162,31 @@ class GenericBrowserAdapter(BaseAdapter):
             except Exception as exc:  # noqa: BLE001
                 warnings.append(f"browser navigation error: {type(exc).__name__}: {exc}")
             page.wait_for_timeout(min(options.browser_wait_ms, 5000))
+            dismissed = dismiss_dynamic_overlays(page, max_rounds=5)
+            if dismissed:
+                page.wait_for_timeout(700)
 
-            for _ in range(min(options.max_pages, 20)):
+            for page_index in range(min(options.max_pages, 20)):
+                before_jobs = len(jobs)
                 try:
+                    dismiss_dynamic_overlays(page, max_rounds=2)
                     page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
                     page.wait_for_timeout(400)
                     clicked = page.evaluate(
                         """() => {
                           const words=['下一页','下页','更多','加载更多','Next','Load more'];
                           const els=[...document.querySelectorAll('button,a')];
-                          const el=els.find(e=>words.some(w=>(e.innerText||'').trim().includes(w)) && !e.disabled);
+                          const el=els.find(e=>words.some(w=>(e.innerText||'').trim().includes(w)) && !e.disabled && e.getAttribute('aria-disabled')!=='true');
                           if(el){el.click(); return true;} return false;
                         }"""
                     )
                     if clicked:
                         page.wait_for_timeout(700)
+                        dismiss_dynamic_overlays(page, max_rounds=2)
+                    elif len(jobs) <= before_jobs:
+                        break
                 except Exception as exc:  # noqa: BLE001
-                    warnings.append(f"browser paging stopped: {type(exc).__name__}: {exc}")
+                    warnings.append(f"browser paging stopped at page {page_index + 1}: {type(exc).__name__}: {exc}")
                     break
                 if len(jobs) >= options.max_jobs:
                     break

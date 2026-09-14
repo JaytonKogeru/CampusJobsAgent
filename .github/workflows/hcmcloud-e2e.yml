@@ -1,0 +1,116 @@
+name: HCMCloud E2E
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "campus_jobs/adapters/hcmcloud.py"
+      - "campus_jobs/adapters/generic_browser.py"
+      - "campus_jobs/browser_support.py"
+      - "campus_jobs/detector.py"
+      - "campus_jobs/adapters/__init__.py"
+      - "tests/test_hcmcloud.py"
+      - "tests/test_generic_browser.py"
+      - ".github/workflows/hcmcloud-e2e.yml"
+  push:
+    branches:
+      - "feat/**"
+    paths:
+      - "campus_jobs/adapters/hcmcloud.py"
+      - "campus_jobs/adapters/generic_browser.py"
+      - "campus_jobs/browser_support.py"
+      - "campus_jobs/detector.py"
+      - "campus_jobs/adapters/__init__.py"
+      - "tests/test_hcmcloud.py"
+      - "tests/test_generic_browser.py"
+      - ".github/workflows/hcmcloud-e2e.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  inspur-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install crawler
+        run: |
+          python -m pip install -U pip
+          pip install -e '.[browser,dev]'
+          google-chrome --version || google-chrome-stable --version || chromium --version || true
+
+      - name: Unit tests
+        run: pytest tests/test_hcmcloud.py tests/test_generic_browser.py tests/test_detector.py
+
+      - name: Crawl Inspur HCMCloud
+        run: |
+          python -m campus_jobs.cli \
+            'https://inspur.hcmcloud.cn/recruit#/portal_job_list?job_class=_HB5_Y2FtcHVz&filter_dict=_HB5_eyJf!m9iX2NsYXNzIjoiY2FtcHVzIiwic2VsZWN0X2RlcGFydCI6bnVsbH0%253D' \
+            --scope campus \
+            --page-size 50 \
+            --max-pages 30 \
+            --max-jobs 500 \
+            --timeout 45 \
+            --out /tmp/inspur-hcmcloud.json
+          cat /tmp/inspur-hcmcloud.json
+
+      - name: Validate completeness, fields and pagination quality
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path('/tmp/inspur-hcmcloud.json').read_text(encoding='utf-8'))
+          warnings = data.get('warnings') or []
+          jobs = data.get('jobs') or []
+          bad = [
+              warning for warning in warnings
+              if any(token in warning.lower() for token in (
+                  'integrity incomplete',
+                  'integrity unverified',
+                  'pagination stalled',
+                  'pagination repeated',
+                  'pagination click failed',
+                  'popup remained visible',
+                  'rendered no job rows',
+              ))
+          ]
+          ids = [str(job.get('id') or '') for job in jobs]
+          titles = [str(job.get('title') or '') for job in jobs]
+          assert data.get('adapter') == 'hcmcloud', data.get('adapter')
+          assert len(jobs) >= 3, f'suspiciously low count={len(jobs)} warnings={warnings}'
+          assert len(ids) == len(set(ids)), 'duplicate job ids detected'
+          assert all(title and title != '浪潮' for title in titles), titles[:20]
+          assert not bad, bad
+
+          checked_fields = ('company', 'location', 'function', 'published_at', 'requirements')
+          coverage = {
+              field: sum(bool(str(job.get(field) or '').strip()) for job in jobs) / len(jobs)
+              for field in checked_fields
+          }
+          low_coverage = {field: ratio for field, ratio in coverage.items() if ratio < 0.95}
+          assert not low_coverage, (
+              'serialized field coverage too low: '
+              + ', '.join(f'{field}={ratio:.1%}' for field, ratio in low_coverage.items())
+          )
+
+          coverage_text = ' '.join(f'{field}={ratio:.1%}' for field, ratio in coverage.items())
+          print(
+              f"validated adapter=hcmcloud count={len(jobs)} warnings={len(warnings)} "
+              f"{coverage_text}"
+          )
+          PY
+
+      - name: Upload live result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inspur-hcmcloud-result
+          path: /tmp/inspur-hcmcloud.json
+          if-no-files-found: warn
