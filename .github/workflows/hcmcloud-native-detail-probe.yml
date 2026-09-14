@@ -26,20 +26,22 @@ jobs:
           python -m pip install -U pip
           pip install -e '.[browser,dev]'
           google-chrome --version || google-chrome-stable --version || chromium --version || true
-      - name: Trace HCMCloud HB5 encoder
+      - name: Trace HCMCloud detail routing and HB5 encoder
         run: |
           python - <<'PY'
           import json
           import re
           from pathlib import Path
-          from urllib.parse import urljoin
 
           from playwright.sync_api import sync_playwright
           from campus_jobs.browser_support import chromium_launch_kwargs, dismiss_dynamic_overlays
 
           URL = 'https://inspur.hcmcloud.cn/recruit#/portal_job_list?job_class=_HB5_Y2FtcHVz&filter_dict=_HB5_eyJf!m9iX2NsYXNzIjoiY2FtcHVzIiwic2VsZWN0X2RlcGFydCI6bnVsbH0%253D'
-          needles = [r'_HB5_', r'HB5', r'hb5', r'base64', r'btoa\(', r'atob\(', r'encodeURIComponent', r'decodeURIComponent']
-          report = {'source_url': URL, 'scripts': [], 'matches': []}
+          terms = [
+              'portal_job_detail', '_HB5_', 'HB5', 'hcm-key', 'hcm_param',
+              'hcm_transfer_strategy', 'base64', 'btoa(', 'atob(',
+          ]
+          report = {'source_url': URL, 'bundles': [], 'matches': []}
 
           with sync_playwright() as p:
               browser = p.chromium.launch(**chromium_launch_kwargs())
@@ -53,46 +55,36 @@ jobs:
               sources = page.evaluate('''() => [...new Set([
                 ...[...document.scripts].map(s => s.src).filter(Boolean),
                 ...performance.getEntriesByType('resource').map(r => r.name).filter(x => /\\.js(?:[?#]|$)/i.test(x))
-              ])]''')
-              for raw in sources:
-                  src = urljoin(page.url, raw)
-                  if 'hcmcloud.cn' not in src:
-                      continue
-                  item = {'url': src}
+              ])].filter(x => /\/(?:index|common)-[a-f0-9]+\.js(?:[?#]|$)/i.test(x))''')
+
+              for src in sources:
+                  bundle = {'url': src}
                   try:
-                      resp = context.request.get(src, timeout=20000)
-                      item['status'] = resp.status
+                      resp = context.request.get(src, timeout=30000)
                       text = resp.text()
-                      item['bytes'] = len(text)
-                      for needle in needles:
-                          for match in list(re.finditer(needle, text, re.I))[:8]:
-                              start = max(0, match.start() - 700)
-                              end = min(len(text), match.end() + 1100)
-                              snippet = text[start:end].replace('\n', ' ')
+                      bundle.update({'status': resp.status, 'bytes': len(text)})
+                      for term in terms:
+                          positions = [m.start() for m in re.finditer(re.escape(term), text, re.I)]
+                          bundle[f'count:{term}'] = len(positions)
+                          for pos in positions[:20]:
                               report['matches'].append({
                                   'url': src,
-                                  'needle': needle,
-                                  'offset': match.start(),
-                                  'snippet': snippet,
+                                  'term': term,
+                                  'offset': pos,
+                                  'snippet': text[max(0, pos - 1500):min(len(text), pos + 2500)].replace('\n', ' '),
                               })
-                              if len(report['matches']) >= 80:
-                                  break
-                          if len(report['matches']) >= 80:
-                              break
                   except Exception as exc:
-                      item['error'] = f'{type(exc).__name__}: {exc}'
-                  report['scripts'].append(item)
-                  if len(report['matches']) >= 80:
-                      break
+                      bundle['error'] = f'{type(exc).__name__}: {exc}'
+                  report['bundles'].append(bundle)
               browser.close()
 
           Path('/tmp/hcmcloud-native-detail-probe.json').write_text(
               json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8'
           )
-          print(json.dumps({
-              'script_count': len(report['scripts']),
-              'matches': report['matches'][:30],
-          }, ensure_ascii=False, indent=2))
+          priority = [m for m in report['matches'] if m['term'].lower() in {
+              'portal_job_detail', '_hb5_', 'hb5', 'hcm-key', 'hcm_param', 'hcm_transfer_strategy'
+          }]
+          print(json.dumps({'bundles': report['bundles'], 'priority_matches': priority[:50]}, ensure_ascii=False, indent=2))
           PY
       - name: Upload probe
         if: always()
