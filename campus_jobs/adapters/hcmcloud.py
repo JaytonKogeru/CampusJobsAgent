@@ -202,6 +202,24 @@ class HCMCloudAdapter(BaseAdapter):
         )
 
     @staticmethod
+    def _wait_for_row_change(page, previous_key: str, *, timeout: int = 5000) -> bool:
+        if not previous_key:
+            page.wait_for_timeout(700)
+            return True
+        try:
+            page.wait_for_function(
+                """(previous) => {
+                  const row = document.querySelector('.table-row[hcm-key]');
+                  return row && row.getAttribute('hcm-key') && row.getAttribute('hcm-key') !== previous;
+                }""",
+                previous_key,
+                timeout=timeout,
+            )
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
     def _click_next(page) -> str:
         return str(
             page.evaluate(
@@ -216,7 +234,6 @@ class HCMCloudAdapter(BaseAdapter):
                     el.disabled || el.getAttribute('aria-disabled') === 'true'
                     || /(^|\s)(disable|disabled|is-disabled|ivu-page-disabled|ant-pagination-disabled)(\s|$)/.test(el.className || '');
                   const selectors = [
-                    `.hc-paging [ng-click*="onPagingClick('next')"]`,
                     '.el-pagination .btn-next',
                     'button.btn-next',
                     '.ant-pagination-next button',
@@ -252,6 +269,55 @@ class HCMCloudAdapter(BaseAdapter):
             )
             or ""
         )
+
+    @classmethod
+    def _advance_page(cls, page, target_page: int, previous_key: str) -> str:
+        """Advance one page and confirm the virtual table changed.
+
+        HCMCloud's Angular pager can occasionally ignore a rapid second icon
+        click. Prefer a real Playwright click, then fall back to the pager's own
+        editable page-number input so a stalled click cannot silently duplicate a
+        page.
+        """
+        next_selector = ".hc-paging [ng-click=\"onPagingClick('next')\"]"
+        try:
+            next_button = page.locator(next_selector).first
+            if next_button.count() and next_button.is_visible():
+                classes = clean_text(next_button.get_attribute("class"))
+                if "disable" not in classes.split():
+                    next_button.click(timeout=2500)
+                    if cls._wait_for_row_change(page, previous_key, timeout=5500):
+                        return "hc-paging-next"
+        except Exception:
+            pass
+
+        try:
+            page_input = page.locator('.hc-paging input[ng-model="paging.current_page"]').first
+            if page_input.count() and page_input.is_visible():
+                page_input.fill(str(target_page))
+                page_input.blur()
+                try:
+                    page.wait_for_function(
+                        """(target) => {
+                          const input = document.querySelector('.hc-paging input[ng-model="paging.current_page"]');
+                          return input && Number(input.value) === target;
+                        }""",
+                        target_page,
+                        timeout=2500,
+                    )
+                except Exception:
+                    pass
+                if cls._wait_for_row_change(page, previous_key, timeout=6000):
+                    return f"hc-paging-input:{target_page}"
+        except Exception:
+            pass
+
+        fallback = cls._click_next(page)
+        if fallback:
+            page.wait_for_timeout(700)
+            if cls._wait_for_row_change(page, previous_key, timeout=4500):
+                return fallback
+        return ""
 
     @staticmethod
     def _body_sample(page, limit: int = 1600) -> str:
@@ -343,7 +409,7 @@ class HCMCloudAdapter(BaseAdapter):
                 if candidates:
                     first_row_key = clean_text(candidates[0].get("id")) or clean_text(candidates[0].get("href"))
                 if signature and signature in page_signatures:
-                    warnings.append(f"pagination stopped on repeated page signature at page {page_no}")
+                    warnings.append(f"QUALITY_FAIL repeated page signature at page {page_no}")
                     exhausted = True
                     break
                 if signature:
@@ -379,24 +445,15 @@ class HCMCloudAdapter(BaseAdapter):
                     exhausted = True
                     break
 
-                next_action = self._click_next(page)
+                next_action = self._advance_page(page, page_no + 1, first_row_key)
                 if not next_action:
+                    if total_hint is None or len(jobs) < min(total_hint, options.max_jobs):
+                        warnings.append(
+                            f"QUALITY_FAIL pagination stalled before page {page_no + 1}; collected={len(jobs)}"
+                        )
                     exhausted = True
                     break
                 pagination_used = True
-                page.wait_for_timeout(700)
-                if first_row_key:
-                    try:
-                        page.wait_for_function(
-                            """(previous) => {
-                              const row = document.querySelector('.table-row[hcm-key]');
-                              return row && row.getAttribute('hcm-key') !== previous;
-                            }""",
-                            first_row_key,
-                            timeout=3000,
-                        )
-                    except Exception:
-                        pass
 
             if not jobs:
                 sample = self._body_sample(page)
