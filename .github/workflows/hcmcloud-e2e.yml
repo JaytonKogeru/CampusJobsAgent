@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "campus_jobs/adapters/hcmcloud.py"
+      - "campus_jobs/adapters/hcmcloud_angular.py"
       - "campus_jobs/adapters/browser_utils.py"
       - "campus_jobs/adapters/generic_browser.py"
       - "campus_jobs/adapters/__init__.py"
