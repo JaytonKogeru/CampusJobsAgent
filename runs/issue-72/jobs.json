@@ -1,0 +1,10 @@
+{
+  "adapter": "generic-browser",
+  "source_url": "https://jobs.hisense.com/campus/jobs",
+  "count": 0,
+  "warnings": [
+    "browser final_url=https://jobs.hisense.com/campus/jobs; quality=0/0 informative; body_sample=首页\n校园招聘\n社会招聘\n登录/注册\n搜索职位\n全部职位（共 0 个）",
+    "browser API trace:\n200 GET https://jobs.hisense.com/api/Common/GetPortalAIRobot?_timestamp=3331789476897871 | post=- | dict keys=['Code', 'Message', 'MoreMessage', 'TipType', 'Count', 'ReturnUrl', 'Data', 'Total']; Data:dict(['IsOpen', 'PubKey'])\n200 GET https://jobs.hisense.com/api/PortalAgent/GetPortalAgentConfig?portalId=05f0dd33-82e6-4de1-b950-3d142c9833a1 | post=- | dict keys=['Code', 'Message', 'MoreMessage', 'TipType', 'Count', 'ReturnUrl', 'Data', 'Total']; Data:dict(['FloatingIconClientUrl', 'ShowFloatingButton', 'HasAgentPermission', 'QuickQuestions'])\n200 GET https://jobs.hisense.com/api/Template/GetPageGlobalModules | post=- | dict keys=['Code', 'Message', 'MoreMessage', 'TipType', 'Count', 'ReturnUrl', 'Data', 'Total']"
+  ],
+  "jobs": []
+}
