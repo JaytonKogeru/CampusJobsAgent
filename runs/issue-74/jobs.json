@@ -1,0 +1,10 @@
+{
+  "adapter": "generic-browser",
+  "source_url": "https://zhaopin.greeyun.com/home?navSelect=1",
+  "count": 0,
+  "warnings": [
+    "browser final_url=https://zhaopin.greeyun.com/home?navSelect=1; quality=0/0 informative; body_sample=校园招聘\n社会招聘\n公司介绍\n小G客服登录/注册\n职位类型\n博士生\n技术研发类\n信息技术类\n技术支持类\n制造技术类\n经营销售类\n行政职能类\n采购物流类\n职位搜索\n职位名称 职位类型 工作地点 发布时间\n博士生（集成电路）\n博士生\n珠海市\n2026-08-26\n博士生（电机电器）\n博士生\n珠海市\n2026-08-26\n博士生（电力电子）\n博士生\n珠海市\n2026-08-26\n博士生（机械设计）\n博士生\n珠海市\n2026-08-26\n博士生（流体仿真）\n博士生\n珠海市\n2026-08-26\n博士生（制冷暖通）\n博士生\n珠海市\n2026-08-26\n博士生（噪声振动）\n博士生\n珠海市\n2026-08-26\n结构设计\n技术研发类\n珠海市\n2026-08-26\n共 52 条\n1234567\n前往页\nCopyright@珠海格力电器股份有限公司\n粤公网安备 44040202000145号\n粤ICP05006515号",
+    "browser API trace:\n200 GET https://zhaopin.greeyun.com/api/apply/jobs?category=&pageNum=1&pageSize=8&property=1 | post=- | dict keys=['code', 'message', 'data']; data:dict(['list', 'total']); data.list:list[8](['ID', 'Category', 'Position', 'Code', 'Location', 'Experience', 'Education', 'Number', 'Salary', 'PubTime', 'PubName', 'InterviewLocation', 'Status', 'Description', 'Qualifications', 'Ctime', 'Utime', 'quarterId', 'property', 'isInternalRecommend'])\n200 GET https://zhaopin.greeyun.com/api/apply/job/category?recruitmentCategory=1 | post=- | dict keys=['code', 'message', 'data']; data:list[8](['index', 'category'])"
+  ],
+  "jobs": []
+}
