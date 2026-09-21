@@ -251,10 +251,61 @@ class GenericBrowserAdapter(BaseAdapter):
                     page.wait_for_timeout(400)
                     clicked = page.evaluate(
                         """() => {
+                          const isEnabled = (e) =>
+                            e && !e.disabled &&
+                            e.getAttribute('aria-disabled') !== 'true' &&
+                            !/(^|\\s)(disabled|is-disabled)(\\s|$)/i.test(e.className || '');
+
+                          const clickFirst = (els) => {
+                            for (const e of els) {
+                              if (!isEnabled(e)) continue;
+                              try { e.click(); return true; } catch (_) {}
+                            }
+                            return false;
+                          };
+
                           const words=['下一页','下页','更多','加载更多','Next','Load more'];
-                          const els=[...document.querySelectorAll('button,a')];
-                          const el=els.find(e=>words.some(w=>(e.innerText||'').trim().includes(w)) && !e.disabled && e.getAttribute('aria-disabled')!=='true');
-                          if(el){el.click(); return true;} return false;
+                          const textCandidates=[...document.querySelectorAll('button,a')].filter(
+                            e => words.some(w => (e.innerText || '').trim().includes(w))
+                          );
+                          if (clickFirst(textCandidates)) return true;
+
+                          const nextSelectors=[
+                            'a[rel="next"]',
+                            '[aria-label*="next" i]',
+                            '.el-pagination .btn-next',
+                            '.ant-pagination-next:not(.ant-pagination-disabled) a',
+                            '.ant-pagination-next:not(.ant-pagination-disabled) button',
+                            '.van-pagination__item--next:not(.van-pagination__item--disabled) button',
+                            'li.next:not(.disabled) a',
+                            '.pagination-next:not(.disabled) a',
+                            '.pager-next:not(.disabled) a'
+                          ];
+                          for (const selector of nextSelectors) {
+                            if (clickFirst([...document.querySelectorAll(selector)])) return true;
+                          }
+
+                          const currentCandidates=[...document.querySelectorAll(
+                            '[aria-current="page"], .active, .current, .is-active, .selected'
+                          )];
+                          let current = null;
+                          for (const e of currentCandidates) {
+                            const n = parseInt((e.innerText || e.textContent || '').trim(), 10);
+                            if (Number.isFinite(n)) { current = n; break; }
+                          }
+                          if (current !== null) {
+                            const target = String(current + 1);
+                            const numeric=[...document.querySelectorAll('a,button,li')].filter(e => {
+                              const t=(e.innerText || e.textContent || '').trim();
+                              if (t !== target || !isEnabled(e)) return false;
+                              const parent=e.closest(
+                                '[class*="pagination" i], [class*="pager" i], nav, [role="navigation"]'
+                              );
+                              return !!parent;
+                            });
+                            if (clickFirst(numeric)) return true;
+                          }
+                          return false;
                         }"""
                     )
                     if clicked:
