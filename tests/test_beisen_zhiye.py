@@ -32,3 +32,8 @@ def test_location_and_null_date():
     item = {"LocNames": ["合肥", "北京"], "PostDate": "0001-01-01T00:00:00"}
     assert BeisenZhiyeAdapter._location(item) == "合肥 / 北京"
     assert BeisenZhiyeAdapter._published_at(item) == ""
+
+
+def test_ubtech_portal_uses_beisen_adapter():
+    assert BeisenZhiyeAdapter.can_handle("http://zhaopin.ubtrobot.com/campus/jobs")
+    assert BeisenZhiyeAdapter.can_handle("https://example.zhiye.com/campus/jobs")
