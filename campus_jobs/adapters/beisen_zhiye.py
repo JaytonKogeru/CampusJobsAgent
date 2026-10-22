@@ -42,7 +42,7 @@ class BeisenZhiyeAdapter(BaseAdapter):
     @classmethod
     def can_handle(cls, url: str) -> bool:
         host = (urlparse(url).hostname or "").lower()
-        return host == "zhiye.com" or host.endswith(".zhiye.com")
+        return host == "zhiye.com" or host.endswith(".zhiye.com") or host == "zhaopin.ubtrobot.com"
 
     @staticmethod
     def _default_scope(scope: str) -> tuple[list[str], str, str]:
