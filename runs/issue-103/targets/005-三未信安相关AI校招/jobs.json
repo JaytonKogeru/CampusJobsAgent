@@ -1,0 +1,24 @@
+{
+  "adapter": "beisen-zhiye",
+  "source_url": "https://sansec.zhiye.com/campus/jobs",
+  "count": 1,
+  "warnings": [
+    "no dynamic category found for scope=campus; fallback=['2']"
+  ],
+  "jobs": [
+    {
+      "id": "dafb0e71-07f3-4d68-a376-4a6f1c7483d3",
+      "title": "AI应用工程师(J10058)",
+      "url": "https://sansec.zhiye.com/campus/detail?jobAdId=dafb0e71-07f3-4d68-a376-4a6f1c7483d3",
+      "company": "",
+      "location": "山东省·济南市",
+      "department": "研发中心",
+      "function": "软件类",
+      "recruit_type": "校招",
+      "description": "1.参与AI智能体（Agent）的设计与开发，将大模型能力接入实际业务场景；\n2.协助搭建RAG知识问答系统，完成文档处理、知识库构建、检索效果调优等工作；\n3.参与AI应用工作流的编排与调试，实现多工具协同的自动化任务；\n4.对接各大模型API，进行Prompt设计与调优，持续改善AI输出效果；\n5.跟踪AI应用领域的最新进展，配合完成新技术的预研与验证。",
+      "requirements": "1.本科及以上学历，理工类专业均可投递，其中计算机、软件工程、人工智能等相关专业优先，2027届应届毕业生；\n2.熟悉Python，了解FastAPI/Flask等Web框架，能独立完成小项目开发；\n3.对大模型应用开发有基础了解，接触过LangChain、Dify等AI开发框架或AI编程工具；\n4.了解Prompt Engineering的基本思路，有RAG或Agent相关的课程设计/比赛/项目经验者优先。",
+      "source": "sansec.zhiye.com",
+      "published_at": "2026-05-15T10:59:54"
+    }
+  ]
+}

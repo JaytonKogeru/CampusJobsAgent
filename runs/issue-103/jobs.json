@@ -1,0 +1,308 @@
+{
+  "mode": "batch",
+  "targets_count": 11,
+  "failed_targets": 0,
+  "count": 11,
+  "targets": [
+    {
+      "index": 1,
+      "name": "歌尔股份",
+      "url": "https://goertek.hotjob.cn/SU65dd9ebd1c240e4b11c4f491/pb/school.html",
+      "adapter": "wecruit",
+      "count": 1,
+      "warnings": [],
+      "result_file": "runs/issue-103/targets/001-歌尔股份/jobs.json"
+    },
+    {
+      "index": 2,
+      "name": "睿创微纳",
+      "url": "https://raytrontek.zhiye.com/campus/jobs?queryId=9f7a4ed5-06c1-45ea-a005-1f7b68f87d8a",
+      "adapter": "beisen-zhiye",
+      "count": 3,
+      "warnings": [
+        "no dynamic category found for scope=campus; fallback=['2']"
+      ],
+      "result_file": "runs/issue-103/targets/002-睿创微纳/jobs.json"
+    },
+    {
+      "index": 3,
+      "name": "芯恩集成电路",
+      "url": "https://siencampus.hotjob.cn",
+      "adapter": "generic-browser",
+      "count": 0,
+      "warnings": [
+        "browser final_url=https://siencampus.hotjob.cn/; quality=0/0 informative; body_sample=",
+        "browser API trace:\n200 POST https://siencampus.hotjob.cn/wecruit/common/getSLD | post=sld=siencampus.hotjob.cn | dict keys=['data', 'state', 'type']; data:dict(['linkData', 'sld'])\n200 GET https://siencampus.hotjob.cn/wecruit/suite/config/SU64ebfd3f1eb80519a8f9db42?iSaJAx=isAjax&request_locale=zh_CN&t=1793007014971 | post=- | dict keys=['data', 'state', 'type']; data:dict(['websiteTitlePicUrl', 'keywords', 'suitOrgInfoPOs', 'companyName', 'description', 'recruitTypeNameMap', 'companyId', 'webSiteLanguage', 'relationMobileSuiteKey', 'templateNum', 'suiteKey', 'canUseAiRobot']); data.suitOrgInfoPOs:list[1](['orgName', 'orgCode', 'id'])\n200 POST https://siencampus.hotjob.cn/wecruit/webSite/browse/save/SU64ebfd3f1eb80519a8f9db42?iSaJAx=isAjax&request_locale=zh_CN&t=1793007014969 | post=- | dict keys=['state', 'type']"
+      ],
+      "result_file": "runs/issue-103/targets/003-芯恩集成电路/jobs.json"
+    },
+    {
+      "index": 4,
+      "name": "兰剑智能",
+      "url": "https://blueswords.zhiye.com/jobs?activityGuid=3804da55-14da-48ac-900d-30ba6be25194",
+      "adapter": "beisen-zhiye",
+      "count": 6,
+      "warnings": [
+        "no dynamic category found for scope=campus; fallback=['2']"
+      ],
+      "result_file": "runs/issue-103/targets/004-兰剑智能/jobs.json"
+    },
+    {
+      "index": 5,
+      "name": "三未信安相关AI校招",
+      "url": "https://sansec.zhiye.com/campus/jobs",
+      "adapter": "beisen-zhiye",
+      "count": 1,
+      "warnings": [
+        "no dynamic category found for scope=campus; fallback=['2']"
+      ],
+      "result_file": "runs/issue-103/targets/005-三未信安相关AI校招/jobs.json"
+    },
+    {
+      "index": 6,
+      "name": "潍柴集团",
+      "url": "https://weichai.zhiye.com/jobs",
+      "adapter": "beisen-zhiye",
+      "count": 0,
+      "warnings": [
+        "no dynamic category found for scope=campus; fallback=['2']"
+      ],
+      "result_file": "runs/issue-103/targets/006-潍柴集团/jobs.json"
+    },
+    {
+      "index": 7,
+      "name": "齐鲁银行",
+      "url": "https://www.qlbchina.com/qlbchina/rczp/xyzp/zpgg/index.html",
+      "adapter": "generic-browser",
+      "count": 0,
+      "warnings": [
+        "browser paging stopped at page 3: Error: Page.evaluate: TypeError: Cannot read properties of null (reading 'scrollHeight')\n    at eval (eval at evaluate (:370:30), <anonymous>:1:34)\n    at eval (<anonymous>)\n    at UtilityScript.evaluate (<anonymous>:370:30)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+        "browser final_url=https://www.qlbchina.com/qlbchina/index.html; quality=0/0 informative; body_sample=4006096588\n无障碍\n客户服务\n人才招聘\n个人业务\n公司业务\n普惠金融\n信用卡\n今日齐鲁\n个人网上银行\n个人手机银行\n齐鲁e家亲\n最新公告\n齐鲁银行个人住房贷款财政贴息服务客户常见问题解答\n— 2026年10月13日\n齐鲁银行关于落实居民购房贷款贴息政策的公告\n— 2026年09月30日\n关于调整服务收费项目的公告(2026.09.30)\n— 2026年09月30日\n齐鲁银行关于大额支付系统延长运行时间的公告\n— 2026年09月21日\n国家金融监督管理总局青岛监管局关于颁发《中华人民共和国金融许可证》...\n— 2026年09月18日\n齐鲁银行关于个人消费贷款（含信用卡分期）财政贴息政策客户关注问题解...\n— 2026年08月28日\n关于明示企业贷款综合融资成本的告知书\n— 2026年08月10日\n齐鲁银行关于个人贷款业务明示综合融资成本的公告\n— 2026年07月30日\n关于微信银行系统升级暂停服务的公告\n— 2026年07月29日\n关于优化我行消息通知渠道的公告\n— 2026年07月27日\n齐鲁银行个人住房贷款财政贴息服务客户常见问题解答\n— 2026年10月13日\n齐鲁银行关于落实居民购房贷款贴息政策的公告\n— 2026年09月30日\n关于调整服务收费项目的公告(2026.09.30)\n— 2026年09月30日\n齐鲁银行关于大额支付系统延长运行时间的公告\n— 2026年09月21日\n国家金融监督管理总局青岛监管局关于颁发《中华人民共和国金融许可证》...\n— 2026年09月18日\n齐鲁银行关于个人消费贷款（含信用卡分期）财政贴息政策客户关注问题解...\n— 2026年08月28日\n关于明示企业贷款综合融资成本的告知书\n— 2026年08月10日\n齐鲁银行关于个人贷款业务明示综合融资成本的公告\n— 2026年07月30日\n关于微信银行系统升级暂停服务的公告\n— 2026年07月29日\n关于优化我行消息通知渠道的公告\n— 2026年07月27日\n齐鲁银行个人住房贷款财政贴息服务客户常见问题解答\n— 2026年10月13日\n齐鲁银行关于落实居民购房贷款贴息政策的公告\n— 2026年09月30日\n关于调整服务收费项目的公告(2026.09.30)\n— 2026年09月30日\n齐鲁银行关于大额支付系统延长运行时间的公告\n— 2026年09月21日\n国家金融监督管理总局青岛监管局关于颁发《中华人民共和国金融许可证》...\n— 2026年09月18日\n齐鲁银行关于个人消费贷款（含信用卡分期）财政贴息政策客户关注问题解...\n— 2026年08月28日\n关于明示企业贷款综合融资成本的告知书\n— 2026年08月10日\n齐鲁银行关于个人贷款业务明示综合融资成本的公告\n— 2026年07月30日\n关于微信银行系统升级暂停服务的公告\n— 2026年07月29...",
+        "browser API trace:\n200 POST https://www.qlbchina.com/eportal/ui?moduleId=3&pageId=60af5426639a4931b5f609bb486e9f01&portal.url=/portlet/easysite-behavior-analysis!save.portlet | post=&url=https%253A//www.qlbchina.com/qlbchina/index.html&rurl=https%253A//www.qlbchina.com/qlbchina/index.html&pvi=1793007023782880768909&si=17930070237832318352263&scr=1440x1000&scl=24-bit&lg=en-us&jv=0&tz=0&fl=-&hp=&os=Linux&bs=Chrome/155&bsn=Chrome&device=pc&deviceOs=Linux&deviceVersion=Linux&userAgent=Mozilla/5.0+(X11;+Linux+x86_64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+HeadlessChrome/155.0.0.0+Safari/537.36&ps=82&sh=1833&siteId=b0441d99a7f24b5ebce6058f0121bd15&siteName=%E9%BD%90%E9%B2%81%E9%93%B6%E8%A1%8C&siteEnname=qlbchina&siteType=WEB&articleKey=&columnId=&pageId=60af5426639a4931b5f609bb486e9f01&memberId=&msgDataId=&msgboardId=&pageTitle=%E9%BD%90%E9%B2%81%E9%93%B6%E8%A1%8C+%E5%9C%A8%E... | dict keys=['success', 'successMessage']\n200 POST https://www.qlbchina.com/eportal/ui?moduleId=3&pageId=60af5426639a4931b5f609bb486e9f01&portal.url=/portlet/easysite-behavior-analysis!save.portlet | post=&url=https%253A//www.qlbchina.com/qlbchina/index.html&rurl=https%253A//www.qlbchina.com/qlbchina/index.html&pvi=1793007023782880768909&si=17930070237832318352263&scr=1440x1000&scl=24-bit&lg=en-us&jv=0&tz=0&fl=-&hp=&os=Linux&bs=Chrome/155&bsn=Chrome&device=pc&deviceOs=Linux&deviceVersion=Linux&userAgent=Mozilla/5.0+(X11;+Linux+x86_64)+AppleWebKit/537.36+(KHTML,+like+Gecko)+HeadlessChrome/155.0.0.0+Safari/537.36&ps=54&sh=1833&siteId=b0441d99a7f24b5ebce6058f0121bd15&siteName=%E9%BD%90%E9%B2%81%E9%93%B6%E8%A1%8C&siteEnname=qlbchina&siteType=WEB&articleKey=&columnId=&pageId=60af5426639a4931b5f609bb486e9f01&memberId=&msgDataId=&msgboardId=&pageTitle=%E9%BD%90%E9%B2%81%E9%93%B6%E8%A1%8C+%E5%9C%A8%E... | dict keys=['success', 'successMessage']"
+      ],
+      "result_file": "runs/issue-103/targets/007-齐鲁银行/jobs.json"
+    },
+    {
+      "index": 8,
+      "name": "中国建设银行山东省分行",
+      "url": "https://job1.ccb.com/cn/job/announcement.html?annoId=20260902172419697692&orgId=2034199&planType=XY",
+      "adapter": "generic-browser",
+      "count": 0,
+      "warnings": [
+        "browser final_url=https://wealth.ccb.com/cn/job/announcement.html?annoId=20260902172419697692&orgId=2034199&planType=XY; quality=0/0 informative; body_sample=集团网站\n访问CCB.COM\n|\n无障碍\n|\n大字版\n集团\n校园招聘首页\n校园宣讲会\n常见问题\n关于建行\n网站\n登录\n集团网站首页>招聘首页>校园招聘首页 > 公告列表 > 公告详情\n中国建设银行山东省分行2027年度校园招聘公告\n发布时间：2026-09-04 14:00\n中国建设银行山东省分行成立于1954年10月，现有营业机构800个，在岗员工1.9万人。分行始终把习近平总书记对山东工作、对金融领域、对建设银行的重要指示要求作为根本遵循，以支持绿色低碳高质量发展先行区建设为总抓手，持续增强“三个能力”，扎实做好“五篇大文章”。截至2026年6月末，各项存款余额1.59万亿元，各项贷款余额1.21万亿元，重点领域信贷投放高速增长，资产质量保持同业前列，经营发展向新向优，有力支持全省高质量发展走在前、挑大梁。\n一、招聘机构及人数\n中国建设银行山东省分行，招聘800人。\n二、招聘条件\n应聘者在符合《中国建设银行境内分支机构2027年度校园招聘公告》中“招聘基本条件”的基础上，还应满足以下要求：\n（一）境内院校毕业生须具有普通高等院校大学本科及以上学历、学位，且在2026年1月至2027年7月之间毕业，报到时取得国家认可的毕业证和学位证。\n境外院校归国留学生须在2026年1月至2027年7月之间毕业，报到时取得学历（学位）证书，以及国家教育部留学服务中心出具的国外学历学位认证书。\n（二）应聘济南市城区机构的毕业生应具有良好的外语沟通能力，具体要求如下：\n1.须通过国家大学英语四级（CET4）考试（成绩不低于425分），或托业（TOEIC）听读公开考试（成绩不低于630分），或新托福（TOEFL-IBT）考试（成绩不低于75分），或雅思（IELTS）考试（成绩不低于5.5分）。\n2.英语专业毕业生须通过国家英语专业四级考试（成绩不低于60分），其他外语类专业毕业生须通过主修语种的相应水平考试。\n三、招聘岗位及说明\n1.管理培训生（通用方向）。作为一级分行、二级分支行部门及网点负责人岗位的管理人才储备，在基层进行一定期限的培养锻炼后，根据培养情况，安排在一级分行、二级分支行部门工作，或作为网点负责人的后备人选。\n2.管理培训生（数字金融方向）。主要从事数字金融、科技金融等工作，重点招收计算机、数理统计、人工智能等相关专业毕业生。在基层进行一定期限的培养锻炼后，根据培养情况，安排在一级分行、二级分支行相关部门工作。\n管理培训生应毕业于境内外知名院校，并通过大学英语六级（425分以上），或托业（TOEIC）听读公开考试（成绩不低于715分），或新托福（TOEFL-IBT）考试（成绩不低于85分），或雅思（IELTS）考试（成绩不低于6.5分），英语专业毕业生须通过国家英语专业八级考试（成绩不低于60分），其他外语类专业毕业生须通过主修语种的相应水平考试。境内院校毕业生..."
+      ],
+      "result_file": "runs/issue-103/targets/008-中国建设银行山东省分行/jobs.json"
+    },
+    {
+      "index": 9,
+      "name": "中国华戎科技集团",
+      "url": "https://jobcareer.sdu.edu.cn/eweb/jygl/index.so?id=7GJr5dqpd2jky3dzRc1HaU&modcode=jygl_zpxxck&subsyscode=zpfw&type=ssoViewZpxx",
+      "adapter": "generic-browser",
+      "count": 0,
+      "warnings": [
+        "browser final_url=https://jobcareer.sdu.edu.cn/eweb/jygl/index.so?id=7GJr5dqpd2jky3dzRc1HaU&modcode=jygl_zpxxck&subsyscode=zpfw&type=ssoViewZpxx; quality=0/0 informative; body_sample=首页\n中国华戎科技集团有限公司招聘\n发布日期：2003-01-01 浏览量：828\n招聘信息\n标题 中国华戎科技集团有限公司招聘 招聘截止日期 2025-12-31\n应聘网址 简历投递邮箱 hr@chrtc.cn\n招聘简章：\n中国华戎科技集团有限公司2026校园招聘简章\n一、 公司简介\n中国华戎科技集团有限公司始建于1989年6月，前身系国务院国资委所属全民所有制企业，后经批准改制重组，按现代企业管理制度运营，在国家工商总局登记注册，总部设在北京，研发中心设在山东济南，生产制造基地设在山东德州，集团下辖华戎信息、华戎技术、华戎装备等多家专业子公司。\n中国华戎是一家有着国企基因、军工血统、报国情怀的高科技军工防务公司。公司长期致力于军民融合发展战略，面向国防军队和公共安全行业客户，深耕信息化、智能化、无人化技术领域，专注军民两用高新技术及装备的研发与制造，以智能装备研制生产、信息系统设计研发以及系统集成服务为核心业务，具有研产一体、软硬一体、军民一体、运服一体的核心优势与能力。\n【企业资质】高新技术企业，专精特新企业，具备武器装备科研生产单位二级保密资质、装备承制单位资格证书、武器装备生产备案凭证等全部军工资质、安防一级资质。\n【研发实力】拥有无人系统教育部工程研究中心、社会安全风险感知与防控大数据应用国家工程试验室、山东应急产业技术创新研究院及警用无人装备联合创新实验室等一流科研环境，依托国防科技大学深厚的技术智力资源共建军用装备科研中心。\n【高端制造】聚焦装备产品的试验检验和生产制造，拥有军工科研生产制造基地，厂房面积30000余平方米，综合试验场近50000平方米，满足军工产品高质量、严准入技术性能要求，具备良好的科研生产硬件环境和批量生产能力，拥有国内领先的科研生产设备设施。\n【企业文化】脱胎于军工央企，传承红色血统，禀赋蓝色基因。公司着力打造铁军文化，为客户创造价值，为奋斗者提高平台，为社会进步贡献智慧与力量，为国家繁荣、民族复兴、企业发展、员工幸福而持续奋斗。\n二、 招聘计划\n（一）招聘对象\n1、2026年应届毕业生（本科、硕士）\n2、专业方向\n1) 计算机科学与技术/软件工程\n2) 机器人工程/人工智能/控制工程\n3) 集成设计/机械工程/自动化/电气工程/通信工程\n（二）招聘岗位\n序号\n岗位名称\n专业方向\n需求人数\n学历层次\n硕研\n本科\n1\n算法工程师（自主驾驶）\n机器人、机器人工程、人工智能、控制科学与工程、计算科学与应用（人工智能方向）等专业\n8\n8\n2\n算法工程师（计算机视觉方向）\n6\n6\n3\n软件工程师（C++方向）\n软件工程、计算机相关专业、通信工程等\n5\n2\n3\n4\n硬件工程师\n集成设计、自动化、控制工程、电子信息等专业\n5\n2\n3\n5\n电气工程师\n集成设计、自动化、控制工程、电子信息等相关专业\n5\n2\n3\n6\n嵌入式软件工程师\n软..."
+      ],
+      "result_file": "runs/issue-103/targets/009-中国华戎科技集团/jobs.json"
+    },
+    {
+      "index": 10,
+      "name": "神思电子",
+      "url": "https://jobcareer.sdu.edu.cn/eweb/jygl/index.so?id=PcPUEMUdywV1or7BT5y5W1&modcode=jygl_zpxxck&subsyscode=zpfw&type=ssoViewZpxx",
+      "adapter": "generic-browser",
+      "count": 0,
+      "warnings": [
+        "browser final_url=https://jobcareer.sdu.edu.cn/eweb/jygl/index.so?id=PcPUEMUdywV1or7BT5y5W1&modcode=jygl_zpxxck&subsyscode=zpfw&type=ssoViewZpxx; quality=0/0 informative; body_sample=首页\n神思电子技术股份有限公司招聘\n发布日期：2003-01-01 浏览量：434\n招聘信息\n标题 神思电子技术股份有限公司招聘 招聘截止日期 2026-06-30\n应聘网址 简历投递邮箱 lining@sdses.com\n招聘简章：\n遇见AI 遇见你\n神思电子技术股份有限公司\n校园招聘简章\n一、关于我们\n神思电子（股票代码：300479）位于山东济南，公司成立于2004年，济南能源集团控股国有上市公司，是中国领先的身份识别解决方案的提供商和服务商。国家级专精特新“小巨人”、中国身份识别智能服务领域领军企业、AI中国·最强人工智能公司TOP30。\n业务方向\n基于对技术演变趋势的判断以及身份识别与人工智能逻辑关系的理解，确定了“从身份识别到智能认知，从行业深耕到行业贯通”的升级战略，先后与IBM、百度、华为、商汤等人工智能头部企业深度合作。\n神思电子聚焦智慧城市，深耕智慧医疗、身份认证领域，逐步打造“一体两翼”新格局，服务于能源、政务、医疗、应急、公安及金融等行业客户。\n科研实力\n神思电子连续多年认定为国家高新技术企业，建设有山东省、济南市企业技术中心、工程技术中心、工程研究中心等研发平台十项，省市博士后、人才实践基地四项。\n经过多年的技术积累和研发创新，神思电子拥有授权国内专利220项，授权PCT专利1项，受理中国内专利136项，获得软件著作权434项；建设省市专利导航五项，入选国家知识产权优势企业；\n公司完成41项人工智能技术和方案的企标建设，参与1项国际、7项国家、3项行业、9项地方、6项团体及2项数字山东工程标准，成为全国信标委人工智能分委会委员单位、山东省人工智能标准化技术委员会副主任委员单位。\n二、招聘职位\n类别\n岗位\n岗位职责\n人数\n专业要求\n学历\n算法类\nOR算法\n负责智慧能源领域资源优化配置最优化方法研究与算法设计\n1\n数学、运筹学、控制工程等相关专业\n硕士/博士\nNLP算法\n负责自然语言处理、大语言模型、知识图谱等前沿技术的研发工作\n1\n计算机、数学、电子相关专业\n硕士/博士\nCV算法\n负责图生文、文生图、视频生文、文生视频等多模态数据AIGC研究\n2\n计算机、数学、电子相关专业\n硕士/博士\n控制算法\n负责无人机组装、调试及规划控制算法开发；跟踪机器人领域最新动态，调研可落地方案。\n1\n计算机、软件、通信、电子、控制等相关专业\n硕士/博士\n感知算法\n负责无人机环境感知系统设计与开发，涵盖目标检测、目标跟踪、动态避障、语义理解等核心模块\n1\n计算机、软件、通信、电子、控制等相关专业\n硕士/博士\n软开类\nC++开发\n负责研发概要设计、详细设计，并输出相关设计文档，根据设计进行代码开发、单元测试，执行日常模块维护\n2\n计算机、软件、通信、电子、自动化等相关专业\n本科/硕士\nJAVA开发\n负责平台软件的开发、维护，参与需求、设计、分析、编码、文档编..."
+      ],
+      "result_file": "runs/issue-103/targets/010-神思电子/jobs.json"
+    },
+    {
+      "index": 11,
+      "name": "若临视讯",
+      "url": "https://jobcareer.sdu.edu.cn/eweb/jygl/index.so?id=14PswruTx3YgjQEqDNk8eW&modcode=jygl_zpxxck&subsyscode=zpfw&type=ssoViewZpxx",
+      "adapter": "generic-browser",
+      "count": 0,
+      "warnings": [
+        "browser final_url=https://jobcareer.sdu.edu.cn/eweb/jygl/index.so?id=14PswruTx3YgjQEqDNk8eW&modcode=jygl_zpxxck&subsyscode=zpfw&type=ssoViewZpxx; quality=0/0 informative; body_sample=首页\n济南若临视讯技术有限公司招聘\n发布日期：2003-01-01 浏览量：131\n招聘信息\n标题 济南若临视讯技术有限公司招聘 招聘截止日期 2024-05-31\n应聘网址 简历投递邮箱\n招聘简章：\n济南若临视讯技术有限公司始创于2010年，是业内领先的智慧信息和数字安防解决方案提供商和运营服务商。公司以技术创新为基础，业务聚焦机车安防视频、智慧机务、智慧交通等领域，致力于构建车网融合、数智融合、人车安全的数字化企业。\n公司拥有业内领先的核心技术和自主研发能力。目前已拥有发明专利、实用新型专利、软件著作权、外观专利等几十余项自主知识产权。拥有山东省工业企业“一企一技术”研发中心，济南市工业企业“一企一技术”研发中心，高新技术企业，山东省“专精特新”企业，济南市瞪羚企业，公司先后通过了ISO/TS22163:2017 轨道交通业质量管理体系认证、中铁检验认证中心CRCC认证、ISO9001:2015质量管理体系认证、ISO14001:2015环境管理体系认证、ISO45001:2018职业健康安全管理体系认证；铁路总公司6A系统、中国国家铁路集团有限公司、中国中车等多家企业的优质供应商和服务商。\n公司先后荣获“山东省十佳安防企业”、铁路系统“科技技术进步奖”、“山东省2011-2012年度安防行业诚信企业”、济南市“重合同守信用企业”等荣誉资质。我们始终坚持从用户应用需求出发，以创新为向导，凭借对国内商业运营环境的深刻理解、丰富的行业经验、专业的技术服务团队以及大量工程服务经验，为用户提供系统评估、方案设计、应用软件开发、技术培训直至安装维护在内的全方位服务。\n“亲切、开放、严谨”的公司文化和科学规范的管理，凝聚了大量的优秀人才，拥有优秀的管理团队和技术团队，他们在产品开发、推广和维护方面默契合作，深刻理解“以客户为中心”的含义，将“服务”贯穿于公司运作和管理的每一个细节。持续加大研发投入、不断致力于技术创新，以精湛的生产工艺、稳定的产品质量和严格的管理体系服务于广大客户，凭借雄厚的技术实力与卓越的商业信誉，赢得了国内外众多知名厂商的信赖与认可。\n我们时刻关注产品细节，立足于自身的技术优势，引入专业的加工合作伙伴，辅以完善的售后服务网络及供销渠道，矢志成为全球轨道交通领域综合监控及智能化解决方案领导者。\n招聘附件:\n职位(1): 算法工程师\n职位名称 算法工程师\n需求人数 1-5人 工作所在地 山东省 济南市\n外语语种要求 英语 月薪(元) 8000-18000 职位类别 其他人员\n学历 本科毕业,硕士毕业\n专业\n职位描述 岗位职责 1、负责计算机视觉算法和深度学习算法的前沿技术的研发工作； 2、负责物体检测（人脸、车辆）、分类、跟踪、识别、图像理解、图像质量评估和增强，视频分析等前沿技术研发和实现； 3、负责算法的产品开发、优化实现、移植及其在嵌入式系统的..."
+      ],
+      "result_file": "runs/issue-103/targets/011-若临视讯/jobs.json"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "6a1536dae791100f0a0900b8",
+      "title": "2027届校招-算法研发岗（精英、歌尔之翼）(048763)",
+      "url": "https://goertek.hotjob.cn/SU65dd9ebd1c240e4b11c4f491/pb/school.html#/postDetail?postId=6a1536dae791100f0a0900b8",
+      "company": "",
+      "location": "北京市、成都市、重庆市、长沙市、杭州市、济南市、南京市、青岛市、上海市、深圳市、潍坊市、新加坡",
+      "department": "人力资源本部",
+      "function": "研发技术",
+      "recruit_type": "校招",
+      "description": "方向1：AI算法研发-潍坊、青岛、北京、上海、南京、成都、深圳、杭州、长沙\n1、负责多种类AI场景开发落地工作，包括但不限于IT数智化、APS、具身智能、模具材料设计、影像色彩提升、目标检测、RAG、数字孪生、自动驾驶、人机交互等，研究领域包括但不限于：机器学习、VLM/VLA、大模型、Agent等；\n2、完成核心算法研究及优化，性能优化及疑难问题的钻研等；\n3、将复杂工业问题抽象并转化为ML/AI/LLM方案；\n4、跟踪和研究各AI领域的最新技术，探索新的算法和优化方法；\n5、编写项目技术文档，算法方案，并记录算法设计和优化过程。为团队成员提供技术支持，协助解决技术难题。\n方向2：常规视觉算法研发-潍坊、青岛、上海、北京、济南\n1、围绕工业相机、VR/AR、MicroLED等产品，主导机器视觉与深度学习核心算法研发，聚焦图像分类、目标检测、语义/实例分割、OCR、视觉跟踪等方向，攻克复杂业务场景技术难点；\n2、负责深度学习模型（CNN/ViT/YOLO等）的设计、训练、微调与优化，提升模型准确率、实时性与鲁棒性；\n3、主导算法工程化落地，配合团队完成模型量化压缩、推理加速（TensorRT/ONNX）、部署上线（Docker/K8s），解决latency、Throughput等工程指标问题；\n4、负责协助自动化装备视觉硬件的需求分析、物料选型及测试，与FPGA、MCU团队合作，将算法集成到嵌入式系统或上位机；\n4、跟踪全球机器视觉与深度学习前沿技术（如多模态融合、小样本学习），结合业务场景进行技术预研与创新；\n5、参与技术方案评审、团队技术分享，指导初级算法工程师成长，搭建高效算法研发流程。\n方向3：声学算法研发-上海、南京、重庆\n1、负责通话主动降噪等车载音频、远近场拾音及语音唤醒等算法解决方案的代码框架搭建与集成、工程落地、资源优化及主客观性能调优；\n2、算法模型研发：负责算法模型的搭建，提高算法的复用性和利用率，结合实际业务创新和改进；\n3、模型训练与评估：负责对研发模型进行训练、调优、验证和部署，全面评估模型性能；\n4、模型部署与应用：负责模型封装和部署，持续监控并维护模型的良好运行；\n5、技术研究创新与赋能分享：负责跟进行业发展趋势，结合业务实际需求，探索新兴技术，在公司/部门范围内营造良好的创新技术氛围。\n方向4：运动控制算法研发-潍坊、上海、成都、青岛、北京、新加坡\n1、围绕工业机器人、人形机器人等进行先进控制算法开发，为高精度制造设备研发运动控制、伺服控制、热力控制及力控等算法，提升设备精度与稳定性；\n2、负责视觉平台底层的精密运动控制算法设计，包括多轴联动插补、高阶S曲线轨迹规划、前馈控制及震动抑制算法；\n3、振动分析与预测，主导超精密设备/模块的振动分析，通过开环/闭环振动评估，协同机械设计团队预测振动特性；\n4、振动控制策略设计，开发被动、主动或半主动振动控制技术，优化设备性能与稳定性；\n5、控制系统全流程开发，设计、开发、验证并优化控制系统（含电/电子系统、硬件、软件、固件、传感器及仪器）；\n6、系统测试与迭代，执行设备/模块系统级测试，基于实验数据评估设计有效性，协同机械团队持续改进设计；\n7、技术问题支持，协助设备开发与制造团队解决控制系统技术问题，持续提升系统可靠性与稳定性；\n8、跨部门协作，与机械设计、仿真、工艺等部门紧密合作，确保量产前全流程设备开发、集成与调试成功。\n方向5：运动健康算法研发-上海、深圳\n1、负责可穿戴设备上算法开发，如眼动追踪、位姿估计、传感器校准等；\n2、开展基于生理信号的算法研发工作，包括信号的时频域分析、特征提取、状态估计，以及各类降噪滤波算法的实现与优化；\n3、负责深度学习模型的设计、训练与部署，涵盖计算机视觉领域的卷积神经网络，以及面向时序信号处理的循环神经网络、Transformer等架构；\n4、参与AIAgent系统的架构设计与搭建，探索大语言模型在运动健康领域的应用落地，完成模型微调、提示工程及系统集成工作；\n5、跟踪国际前沿研究动态，阅读并复现中英文文献，将先进算法转化为可工程化的解决方案。\n6、参与算法工程化实现，使用Python进行快速原型验证，使用C++完成部署生产代码开发，使用部署框架进行模型量化压缩等。\n方向6：电机算法研究-成都、潍坊\n1、精密设备（机电系统）运动控制仿真工具的开发和维护；\n2、精密运动控制系统的驱动程序、嵌入式软件、控制算法、应用软件工具及SDK的开发和维护；\n3、精密设备电气系统的设计、验证、分析、优化；\n4、精密设备运动控制性能分析和调试。\n方向7：传感器算法研发-潍坊\n1、负责触觉/力传感器相关算法的全流程研发，涵盖信号处理、特征提取、建模与优化，重点突破压电陶瓷感知数据的降噪、增强及精准解析，基于KK算法实现触觉信息的高效处理与重构；\n2、基于PyTorch、TensorFlow等深度学习框架，搭建、训练并优化触觉感知神经网络模型，具备算法移植能力；探索CNN、Transformers等网络架构在触觉数据处理中的应用，提升模型对复杂触觉场景的识别准确率与泛化能力；\n3、参与传感器数据采集、清洗、标注全流程，搭建自动化数据处理工具链，构建高质量触觉感知数据集，为算法迭代提供坚实数据支撑；\n4、与硬件研发团队协同，针对压电陶瓷传感器特性优化算法适配性；配合后端、SDK开发团队完成算法的工程化集成与部署，推动触觉感知技术在汽车电子项目落地应用；\n5、跟踪触觉感知、机器学习领域前沿动态，探索强化学习、大语言模型与触觉感知的融合应用；撰写技术专利、学术论文与算法文档，推动内部知识沉淀与对外技术影响力提升。\n方向8：三维视觉算法工程师-青岛\n1. 负责人机场景三维视觉算法开发和落地工作，包括但不限于基于RGBD相机的高精人体重建与三维生成、点云分割与配准、视触觉分析等算法方向；\n2. 追踪3D视觉及图形学的最新研究进展，提升模型在多种人机数据场景中的理解和分析能力；\n3. 与产品和人机工程团队紧密合作，推动三维视觉算法在人机业务落地应用，提升产品的技术竞争力及改善用户体验。",
+      "requirements": "方向1：\n1、计算机、人工智能、机器人工程、光学、数学、数据科学、材料模具等相关专业，具备扎实的计算机理论基础，精通Python/C/C++/Java开发。\n2、熟练掌握机器学习、深度学习、行为克隆、轻量化技术等基本原理，熟悉常见的生成模型框架，包括GAN、VAE、VQGAN和DiffusionModel；\n3、熟悉自监督视觉算法，熟悉transformer或OR-Tools/Gurobi等运筹优化工具，有大模型训练和调参经验；\n4、熟练掌握pytorch/paddlepaddle/DeepSpeed/FSDP等框架，熟悉常见的基于深度学习的分割定位算法与数据结构,了解强化学习工具库（如RLlib/StableBaselines3）。\n5、结果导向，工作积极主动，沟通表达佳，理解力好，具有较强的逻辑思维和抗压能力。\n方向2：\n①光电信息、电子信息、微电子、计算机类硕士及以上学历，具有优秀的光学背景优先；\n②熟悉工业相机/镜头/光源等视觉硬件参数及性能；\n③具有丰富的图像处理算法开发经验，熟练掌握传统图像处理算法的原理，如滤波，二值化，形态学处理等；\n④掌握机器学习算法，如聚类，SVM，随机森林等；\n⑤熟练掌握C++/Matlab/python等算法开发语言，掌握Opencv/Halcon/Visionpro等机器视觉处理软件；\n⑥有嵌入式开发经验，熟悉ARM或FPGA交互，熟悉显示驱动原理，了解PWM/像素补偿等，有AA/半导体设备视觉算法开发经验或掌握机器学习框架(如TensorFlow、Pytorch)，有AI校正算法经验优先优先。\n方向3：\n1、信号处理、电子、通信、声学等相关专业硕士及以上学历；\n2、具备扎实的数学和信号处理基础，C语言编程开发功底良好；\n3、熟悉AEC和ANC等常用音频算法，嵌入式开发调试功底良好；\n4、有较强的学习能力、责任心、上进心、沟通能力及团队协作能力；\n5、熟悉PyTorch和TensorFlow等深度学习框架；\n5、有音频算法开发和应用的项目经历经验者优先。\n方向4：\n1、机器人工程、自动化、控制工程、机械类、计算机等相关专业硕士及以上学历；\n2、理论基础，扎实的控制理论、运动学及系统仿真知识，熟悉主流运动控制架构（如EtherCAT通讯协议），具有DSP/FPGA或实时系统（RTOS）开发经验，能融合现代控制理论（如自适应控制）与传统方法（如PID）开发算法；\n3、技术能力，精通运动控制系统开发及伺服系统调试，熟悉运动控制卡、伺服驱动器等硬件及Matlab/Python等工具；\n4、机电与振动专长，机械动力学与振动分析经验，掌握实验方法及相关工具（如LMSTest、Lab）；\n5、编程技能，熟练使用C/C++/C#等编程语言；\n6、软性素质，创新能力突出，解决问题能力强，具备跨学科团队协作经验；\n7、语言能力，中英文流利（书面与口语）。\n方向5：\n1、生物医学工程、计算机、人工智能、电子、自动化、数学、模式识别、精密仪器等相关专业硕士及以上学历；\n2、扎实的数学功底，熟练掌握线性代数、概率统计、优化理论，能够熟练运用四元数、旋转矩阵进行三维几何计算；\n3、熟悉数字信号处理理论，掌握FFT、小波变换、时频分析等方法，具备卡尔曼滤波等状态估计算法的实践经验；\n4、熟练掌握深度学习框架（PyTorch或TensorFlow），具备图像分类、目标检测或时序信号建模的项目经验，了解Transformer、CNN、RNN等主流网络架构；\n5、对大语言模型技术有基本认知，了解Agent构建流程、模型微调或提示工程者优先；\n6、编程能力扎实，精通Python，熟练使用NumPy、SciPy、OpenCV等科学计算库；具备良好的C++基础，能够编写高效、稳健的底层算法代码；\n7、具备较强的英文文献阅读能力，能够快速理解并复现学术论文中的核心算法；\n8、熟练使用Git/SVN等工具进行代码版本管理；\n9、对智能穿戴设备、运动健康、人机交互等领域有兴趣，具备较强的学习能力，善于解决复杂工程问题。\n方向6：\n1、控制工程类相关专业硕士及以上学历；\n2、掌握机电系统动力学基本理论；熟悉BLDC、PMSM等电机控制原理和电机控制算法；\n3、掌握伺服控制原理及应用，鲁棒控制原理及应用，与自适应控制原理及应用；\n4、在以下一个或多个领域具有实际项目经验与知识将得到优先考虑：有参与自动控制方面的课题研究经验；精通使用至少一种运动控制卡，熟悉多轴联动、轨迹规划、速度规划、插补运动等功能，有轨迹控制、多轴插补运动等控制算法的开发经验；基于PCI或者PCIe的运动控制板卡和运控系统的设计和开发经验；机器人上肢运动控制研发经验。\n方向8：\n1. 计算机科学、人工智能、计算机图形学或相关专业硕士及以上学历；\n2. 熟练掌握Python或C++，具备扎实的深度学习工程能力，能够独立完成模型训练、调试、评测和推理部署优化；\n3. 具备扎实的计算机图形学和3D视觉基础，至少在以下一个方面有研究或工程经验：VSLAM、3DGS、3D生成，有相关论文发表者优先；\n4. 熟悉3D渲染与建模，有Blender、Maya、C4D、ZBrush等建模软件或Unity、UE等引擎使用经验者优先；\n5. 具有良好的团队合作精神和沟通能力，能够与团队成员有效协作；具有创新思维和解决问题的能力，能够在技术研究中提出新颖的解决方案。",
+      "source": "goertek.hotjob.cn",
+      "published_at": "",
+      "target_name": "歌尔股份",
+      "target_url": "https://goertek.hotjob.cn/SU65dd9ebd1c240e4b11c4f491/pb/school.html"
+    },
+    {
+      "id": "c2f9f567-3a0c-4524-94e4-2542c428fdd7",
+      "title": "伺服控制算法工程师",
+      "url": "https://raytrontek.zhiye.com/campus/detail?jobAdId=c2f9f567-3a0c-4524-94e4-2542c428fdd7",
+      "company": "",
+      "location": "陕西省·西安市",
+      "department": "智能机器人事业部",
+      "function": "算法类",
+      "recruit_type": "校招",
+      "description": "1、负责机器人基于激光雷达、摄像头、IMU 等传感器的二/三维 SLAM 算法的应用;\n2、负责机器人在室内未知环境中的 SLAM 算法研发;\n3、负责总体运作系统设计工作，运用已有的算法完成系统构建和应用层的硬件通讯;\n4、负责 SLAM 导航系统的集成、调试、修改、测试和优化工作。",
+      "requirements": "1、电子、通信、自动化、计算机等相关专业硕士及以上学历；\n2、熟悉并熟练使用C++、Python编程语言，并参与过中/大型软件项目的编程设计工作；\n3、熟悉SLAM、导航、路径规划、运动控制及目标识别技术；\n4、熟练应用ROS/ROS2中的各种算法包以及开源导航算法包者优先；\n5、掌握多传感器数据融合（熟悉GPS、激光雷达、IMU等多种设备数据融合）、姿态解算及惯性导航经验者优先；\n6、进行过相关运动控制器、驱动器或嵌入式系统开发经验者优先。",
+      "source": "raytrontek.zhiye.com",
+      "published_at": "2025-05-22T11:50:03",
+      "target_name": "睿创微纳",
+      "target_url": "https://raytrontek.zhiye.com/campus/jobs?queryId=9f7a4ed5-06c1-45ea-a005-1f7b68f87d8a"
+    },
+    {
+      "id": "aa18eeeb-fcc7-48d9-a43f-ba3a8f5e388c",
+      "title": "导航算法工程师",
+      "url": "https://raytrontek.zhiye.com/campus/detail?jobAdId=aa18eeeb-fcc7-48d9-a43f-ba3a8f5e388c",
+      "company": "",
+      "location": "山东省·烟台市",
+      "department": "智能机器人事业部",
+      "function": "算法类",
+      "recruit_type": "校招",
+      "description": "1、负责机器人基于激光雷达、摄像头、IMU 等传感器的二/三维 SLAM 算法的应用;\n2、负责机器人在室内未知环境中的 SLAM 算法研发;\n3、负责总体运作系统设计工作，运用已有的算法完成系统构建和应用层的硬件通讯;\n4、负责 SLAM 导航系统的集成、调试、修改、测试和优化工作。",
+      "requirements": "1、电子、通信、自动化、计算机等相关专业硕士及以上学历；\n2、熟悉并熟练使用C++、Python编程语言，并参与过中/大型软件项目的编程设计工作；\n3、熟悉SLAM、导航、路径规划、运动控制及目标识别技术；\n4、熟练应用ROS/ROS2中的各种算法包以及开源导航算法包者优先；\n5、掌握多传感器数据融合（熟悉GPS、激光雷达、IMU等多种设备数据融合）、姿态解算及惯性导航经验者优先。\n6、进行过相关运动控制器、驱动器或嵌入式系统开发经验者优先。",
+      "source": "raytrontek.zhiye.com",
+      "published_at": "2025-05-22T11:46:19",
+      "target_name": "睿创微纳",
+      "target_url": "https://raytrontek.zhiye.com/campus/jobs?queryId=9f7a4ed5-06c1-45ea-a005-1f7b68f87d8a"
+    },
+    {
+      "id": "1ab83d4f-dd06-4211-b0d8-e992de596e61",
+      "title": "产品算法实习生",
+      "url": "https://raytrontek.zhiye.com/campus/detail?jobAdId=1ab83d4f-dd06-4211-b0d8-e992de596e61",
+      "company": "",
+      "location": "江苏省·苏州市·工业园区",
+      "department": "开发部",
+      "function": "算法类",
+      "recruit_type": "校招",
+      "description": "协助进行新产品研发阶段的标定试制，向工程端输出新产品的标定试制流程，配合产品和项目推动新产品开发。\n参与搭建快速试制线，优化标定试制流程，支持产品图像标定算法以及测温算法的技术专项研究。\n协助向软件部门提供相应算法实现文档，保证软件部门正确开发产品功能。\n反馈新产品试制中由光学、结构、硬件、固件等引入的标定问题，协同相关部门提出解决方案，保障新产品试制交付质量和速度。\n协助收集行业内竞品图像质量和测温精度信息，参与制定图像标定和测温算法的优化方向和目标。\n参与建立技术研究专项，协助制定研究方案，输出最终研究成果并落实到具体产品应用上。\n负责图像标定算法以及测温算法等技术性文档的整理记录和归档。\n协助解决客端反馈的产品问题和工程批量生产的问题。\n协助制定和优化本部门的内部工作流程和标准。",
+      "requirements": "本科及以上在读学生，数学、物理、计算机、自动化等相关专业。\n具备高等数学、概率统计、图像处理等基础知识；熟悉光学成像原理，熟悉红外辐射理论。\n掌握至少一门编程语言或数据处理工具：Labview/C/C++/Python/MATLAB 等。\n熟悉红外探测器工作原理、非均匀性标定方法、红外测温原理者优先考虑。\n具有良好的团队合作意识，学习能力强，有较强的执行力。",
+      "source": "raytrontek.zhiye.com",
+      "published_at": "2026-10-19T14:10:49",
+      "target_name": "睿创微纳",
+      "target_url": "https://raytrontek.zhiye.com/campus/jobs?queryId=9f7a4ed5-06c1-45ea-a005-1f7b68f87d8a"
+    },
+    {
+      "id": "cf2c0f06-a296-4dfc-b335-a9b7bd7eb6f5",
+      "title": "（2027校招）算法工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=cf2c0f06-a296-4dfc-b335-a9b7bd7eb6f5",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "兰剑智能科技股份有限公司",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1.负责公司机器人AGV、AMR、具身机器人等产品的算法研发工作，主要分：SLAM激光定位、建图、机器人集群调度、多智能体路径规划、2D图像处理、3D避障、目标识别检测、视觉VSLAM、具身智能、AI大模型等方向。\n2.参与定位产品从研发到应用的全生命周期",
+      "requirements": "任职资格\n1. 熟悉数据结构与算法\n2. 有一年以上算法相关研究经验\n3. 熟练使用c++、python等编程语言\n4. 计算机、电子信息类（控制类）、数学等相关专业\"",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2026-09-11T19:23:11",
+      "target_name": "兰剑智能",
+      "target_url": "https://blueswords.zhiye.com/jobs?activityGuid=3804da55-14da-48ac-900d-30ba6be25194"
+    },
+    {
+      "id": "3ae80eb9-2e11-4b4f-9384-e00f6c16eda2",
+      "title": "（2026校园招聘）调度算法工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=3ae80eb9-2e11-4b4f-9384-e00f6c16eda2",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "创新产品研发中心",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1.负责AGV集群调度系统的算法设计、开发、维护工作； 2.负责AGV调度系统算法部分：包括：任务调度、多智能体路径规划等 3.参与调度模块产品从研发到应用的全生命周期",
+      "requirements": "任职资格\n1.熟悉数据结构与算法 2. 有一年以上算法相关研究经验 3. 熟练使用c++编程语言 4. 计算机、电子信息类（控制类）、数学等相关专业",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2025-07-31T17:57:45",
+      "target_name": "兰剑智能",
+      "target_url": "https://blueswords.zhiye.com/jobs?activityGuid=3804da55-14da-48ac-900d-30ba6be25194"
+    },
+    {
+      "id": "8afbdb65-f79c-4422-9231-7beded4c5f38",
+      "title": "（2026校园招聘）SLAM算法工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=8afbdb65-f79c-4422-9231-7beded4c5f38",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "创新产品研发中心",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1.负责AMR激光SLAM 定位产品算法研发工作，主要分：建图与定位两部分 2.参与定位产品从研发到应用的全生命周期",
+      "requirements": "任职资格\n1. 熟悉数据结构与算法 2. 有一年以上算法相关研究经验 3. 熟练使用c++编程语言 4. 计算机、电子信息类（控制类）、数学等相关专业",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2025-07-31T17:48:46",
+      "target_name": "兰剑智能",
+      "target_url": "https://blueswords.zhiye.com/jobs?activityGuid=3804da55-14da-48ac-900d-30ba6be25194"
+    },
+    {
+      "id": "7f83acc7-11bf-4c7d-a49f-e583b4762d18",
+      "title": "（2026校园招聘）视觉算法工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=7f83acc7-11bf-4c7d-a49f-e583b4762d18",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "创新产品研发中心",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1.负责视觉产品软件设计、开发、维护工作； 2.算法方向包括：2D图像处理、视觉VSLAM、3D避障。目标识别&检测等 3.参与视觉产品从研发到应用全生命周期",
+      "requirements": "任职资格\n1. 熟悉数据结构与算法 2. 有一年以上算法相关研究经验 3. 熟练使用c++编程语言\" 4. 计算机、电子信息类（控制类）、数学等相关专业",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2025-07-31T17:35:27",
+      "target_name": "兰剑智能",
+      "target_url": "https://blueswords.zhiye.com/jobs?activityGuid=3804da55-14da-48ac-900d-30ba6be25194"
+    },
+    {
+      "id": "b02b2fda-5e50-474b-8973-8c6171dc373a",
+      "title": "（2027校招）Java软件开发工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=b02b2fda-5e50-474b-8973-8c6171dc373a",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "兰剑智能科技股份有限公司",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1. 负责公司机器人产品系统软件的设计, WMS\\WCS系统开发,测试维护；\n2. 负责公司机器人项目落地过程中的问题解决,工具优化；\n3. 参与其他公司机器人产品配套软件功能研发",
+      "requirements": "任职资格\n1.熟悉常用的数据结构与算法\n2.熟练使用java编程语言\n3.语言表达清晰,无沟通障碍",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2026-08-27T16:04:10",
+      "target_name": "兰剑智能",
+      "target_url": "https://blueswords.zhiye.com/jobs?activityGuid=3804da55-14da-48ac-900d-30ba6be25194"
+    },
+    {
+      "id": "d358e84f-1230-4a7d-be4d-3229979e1594",
+      "title": "（2026校园招聘）Java软件开发工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=d358e84f-1230-4a7d-be4d-3229979e1594",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "创新产品研发中心",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1. 负责AGV系统软件的设计,开发,测试维护； 2. 负责AGV项目落地过程中的问题解决,工具优化； 3. 参与其他AGV配套软件功能研发",
+      "requirements": "任职资格\n1 熟悉常用的数据结构与算法 2 熟练使用java编程语言 3 语言表达清晰,无沟通障碍",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2025-07-31T18:45:00",
+      "target_name": "兰剑智能",
+      "target_url": "https://blueswords.zhiye.com/jobs?activityGuid=3804da55-14da-48ac-900d-30ba6be25194"
+    },
+    {
+      "id": "dafb0e71-07f3-4d68-a376-4a6f1c7483d3",
+      "title": "AI应用工程师(J10058)",
+      "url": "https://sansec.zhiye.com/campus/detail?jobAdId=dafb0e71-07f3-4d68-a376-4a6f1c7483d3",
+      "company": "",
+      "location": "山东省·济南市",
+      "department": "研发中心",
+      "function": "软件类",
+      "recruit_type": "校招",
+      "description": "1.参与AI智能体（Agent）的设计与开发，将大模型能力接入实际业务场景；\n2.协助搭建RAG知识问答系统，完成文档处理、知识库构建、检索效果调优等工作；\n3.参与AI应用工作流的编排与调试，实现多工具协同的自动化任务；\n4.对接各大模型API，进行Prompt设计与调优，持续改善AI输出效果；\n5.跟踪AI应用领域的最新进展，配合完成新技术的预研与验证。",
+      "requirements": "1.本科及以上学历，理工类专业均可投递，其中计算机、软件工程、人工智能等相关专业优先，2027届应届毕业生；\n2.熟悉Python，了解FastAPI/Flask等Web框架，能独立完成小项目开发；\n3.对大模型应用开发有基础了解，接触过LangChain、Dify等AI开发框架或AI编程工具；\n4.了解Prompt Engineering的基本思路，有RAG或Agent相关的课程设计/比赛/项目经验者优先。",
+      "source": "sansec.zhiye.com",
+      "published_at": "2026-05-15T10:59:54",
+      "target_name": "三未信安相关AI校招",
+      "target_url": "https://sansec.zhiye.com/campus/jobs"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "adapter": "beisen-zhiye",
+  "source_url": "https://raytrontek.zhiye.com/campus/jobs?queryId=9f7a4ed5-06c1-45ea-a005-1f7b68f87d8a",
+  "count": 3,
+  "warnings": [
+    "no dynamic category found for scope=campus; fallback=['2']"
+  ],
+  "jobs": [
+    {
+      "id": "c2f9f567-3a0c-4524-94e4-2542c428fdd7",
+      "title": "伺服控制算法工程师",
+      "url": "https://raytrontek.zhiye.com/campus/detail?jobAdId=c2f9f567-3a0c-4524-94e4-2542c428fdd7",
+      "company": "",
+      "location": "陕西省·西安市",
+      "department": "智能机器人事业部",
+      "function": "算法类",
+      "recruit_type": "校招",
+      "description": "1、负责机器人基于激光雷达、摄像头、IMU 等传感器的二/三维 SLAM 算法的应用;\n2、负责机器人在室内未知环境中的 SLAM 算法研发;\n3、负责总体运作系统设计工作，运用已有的算法完成系统构建和应用层的硬件通讯;\n4、负责 SLAM 导航系统的集成、调试、修改、测试和优化工作。",
+      "requirements": "1、电子、通信、自动化、计算机等相关专业硕士及以上学历；\n2、熟悉并熟练使用C++、Python编程语言，并参与过中/大型软件项目的编程设计工作；\n3、熟悉SLAM、导航、路径规划、运动控制及目标识别技术；\n4、熟练应用ROS/ROS2中的各种算法包以及开源导航算法包者优先；\n5、掌握多传感器数据融合（熟悉GPS、激光雷达、IMU等多种设备数据融合）、姿态解算及惯性导航经验者优先；\n6、进行过相关运动控制器、驱动器或嵌入式系统开发经验者优先。",
+      "source": "raytrontek.zhiye.com",
+      "published_at": "2025-05-22T11:50:03"
+    },
+    {
+      "id": "aa18eeeb-fcc7-48d9-a43f-ba3a8f5e388c",
+      "title": "导航算法工程师",
+      "url": "https://raytrontek.zhiye.com/campus/detail?jobAdId=aa18eeeb-fcc7-48d9-a43f-ba3a8f5e388c",
+      "company": "",
+      "location": "山东省·烟台市",
+      "department": "智能机器人事业部",
+      "function": "算法类",
+      "recruit_type": "校招",
+      "description": "1、负责机器人基于激光雷达、摄像头、IMU 等传感器的二/三维 SLAM 算法的应用;\n2、负责机器人在室内未知环境中的 SLAM 算法研发;\n3、负责总体运作系统设计工作，运用已有的算法完成系统构建和应用层的硬件通讯;\n4、负责 SLAM 导航系统的集成、调试、修改、测试和优化工作。",
+      "requirements": "1、电子、通信、自动化、计算机等相关专业硕士及以上学历；\n2、熟悉并熟练使用C++、Python编程语言，并参与过中/大型软件项目的编程设计工作；\n3、熟悉SLAM、导航、路径规划、运动控制及目标识别技术；\n4、熟练应用ROS/ROS2中的各种算法包以及开源导航算法包者优先；\n5、掌握多传感器数据融合（熟悉GPS、激光雷达、IMU等多种设备数据融合）、姿态解算及惯性导航经验者优先。\n6、进行过相关运动控制器、驱动器或嵌入式系统开发经验者优先。",
+      "source": "raytrontek.zhiye.com",
+      "published_at": "2025-05-22T11:46:19"
+    },
+    {
+      "id": "1ab83d4f-dd06-4211-b0d8-e992de596e61",
+      "title": "产品算法实习生",
+      "url": "https://raytrontek.zhiye.com/campus/detail?jobAdId=1ab83d4f-dd06-4211-b0d8-e992de596e61",
+      "company": "",
+      "location": "江苏省·苏州市·工业园区",
+      "department": "开发部",
+      "function": "算法类",
+      "recruit_type": "校招",
+      "description": "协助进行新产品研发阶段的标定试制，向工程端输出新产品的标定试制流程，配合产品和项目推动新产品开发。\n参与搭建快速试制线，优化标定试制流程，支持产品图像标定算法以及测温算法的技术专项研究。\n协助向软件部门提供相应算法实现文档，保证软件部门正确开发产品功能。\n反馈新产品试制中由光学、结构、硬件、固件等引入的标定问题，协同相关部门提出解决方案，保障新产品试制交付质量和速度。\n协助收集行业内竞品图像质量和测温精度信息，参与制定图像标定和测温算法的优化方向和目标。\n参与建立技术研究专项，协助制定研究方案，输出最终研究成果并落实到具体产品应用上。\n负责图像标定算法以及测温算法等技术性文档的整理记录和归档。\n协助解决客端反馈的产品问题和工程批量生产的问题。\n协助制定和优化本部门的内部工作流程和标准。",
+      "requirements": "本科及以上在读学生，数学、物理、计算机、自动化等相关专业。\n具备高等数学、概率统计、图像处理等基础知识；熟悉光学成像原理，熟悉红外辐射理论。\n掌握至少一门编程语言或数据处理工具：Labview/C/C++/Python/MATLAB 等。\n熟悉红外探测器工作原理、非均匀性标定方法、红外测温原理者优先考虑。\n具有良好的团队合作意识，学习能力强，有较强的执行力。",
+      "source": "raytrontek.zhiye.com",
+      "published_at": "2026-10-19T14:10:49"
+    }
+  ]
+}

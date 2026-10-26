@@ -1,0 +1,94 @@
+{
+  "adapter": "beisen-zhiye",
+  "source_url": "https://blueswords.zhiye.com/jobs?activityGuid=3804da55-14da-48ac-900d-30ba6be25194",
+  "count": 6,
+  "warnings": [
+    "no dynamic category found for scope=campus; fallback=['2']"
+  ],
+  "jobs": [
+    {
+      "id": "cf2c0f06-a296-4dfc-b335-a9b7bd7eb6f5",
+      "title": "（2027校招）算法工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=cf2c0f06-a296-4dfc-b335-a9b7bd7eb6f5",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "兰剑智能科技股份有限公司",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1.负责公司机器人AGV、AMR、具身机器人等产品的算法研发工作，主要分：SLAM激光定位、建图、机器人集群调度、多智能体路径规划、2D图像处理、3D避障、目标识别检测、视觉VSLAM、具身智能、AI大模型等方向。\n2.参与定位产品从研发到应用的全生命周期",
+      "requirements": "任职资格\n1. 熟悉数据结构与算法\n2. 有一年以上算法相关研究经验\n3. 熟练使用c++、python等编程语言\n4. 计算机、电子信息类（控制类）、数学等相关专业\"",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2026-09-11T19:23:11"
+    },
+    {
+      "id": "3ae80eb9-2e11-4b4f-9384-e00f6c16eda2",
+      "title": "（2026校园招聘）调度算法工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=3ae80eb9-2e11-4b4f-9384-e00f6c16eda2",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "创新产品研发中心",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1.负责AGV集群调度系统的算法设计、开发、维护工作； 2.负责AGV调度系统算法部分：包括：任务调度、多智能体路径规划等 3.参与调度模块产品从研发到应用的全生命周期",
+      "requirements": "任职资格\n1.熟悉数据结构与算法 2. 有一年以上算法相关研究经验 3. 熟练使用c++编程语言 4. 计算机、电子信息类（控制类）、数学等相关专业",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2025-07-31T17:57:45"
+    },
+    {
+      "id": "8afbdb65-f79c-4422-9231-7beded4c5f38",
+      "title": "（2026校园招聘）SLAM算法工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=8afbdb65-f79c-4422-9231-7beded4c5f38",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "创新产品研发中心",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1.负责AMR激光SLAM 定位产品算法研发工作，主要分：建图与定位两部分 2.参与定位产品从研发到应用的全生命周期",
+      "requirements": "任职资格\n1. 熟悉数据结构与算法 2. 有一年以上算法相关研究经验 3. 熟练使用c++编程语言 4. 计算机、电子信息类（控制类）、数学等相关专业",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2025-07-31T17:48:46"
+    },
+    {
+      "id": "7f83acc7-11bf-4c7d-a49f-e583b4762d18",
+      "title": "（2026校园招聘）视觉算法工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=7f83acc7-11bf-4c7d-a49f-e583b4762d18",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "创新产品研发中心",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1.负责视觉产品软件设计、开发、维护工作； 2.算法方向包括：2D图像处理、视觉VSLAM、3D避障。目标识别&检测等 3.参与视觉产品从研发到应用全生命周期",
+      "requirements": "任职资格\n1. 熟悉数据结构与算法 2. 有一年以上算法相关研究经验 3. 熟练使用c++编程语言\" 4. 计算机、电子信息类（控制类）、数学等相关专业",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2025-07-31T17:35:27"
+    },
+    {
+      "id": "b02b2fda-5e50-474b-8973-8c6171dc373a",
+      "title": "（2027校招）Java软件开发工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=b02b2fda-5e50-474b-8973-8c6171dc373a",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "兰剑智能科技股份有限公司",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1. 负责公司机器人产品系统软件的设计, WMS\\WCS系统开发,测试维护；\n2. 负责公司机器人项目落地过程中的问题解决,工具优化；\n3. 参与其他公司机器人产品配套软件功能研发",
+      "requirements": "任职资格\n1.熟悉常用的数据结构与算法\n2.熟练使用java编程语言\n3.语言表达清晰,无沟通障碍",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2026-08-27T16:04:10"
+    },
+    {
+      "id": "d358e84f-1230-4a7d-be4d-3229979e1594",
+      "title": "（2026校园招聘）Java软件开发工程师",
+      "url": "https://blueswords.zhiye.com/campus/detail?jobAdId=d358e84f-1230-4a7d-be4d-3229979e1594",
+      "company": "",
+      "location": "山东省·济南市·济南高新区",
+      "department": "创新产品研发中心",
+      "function": "全职",
+      "recruit_type": "校招",
+      "description": "工作职责\n1. 负责AGV系统软件的设计,开发,测试维护； 2. 负责AGV项目落地过程中的问题解决,工具优化； 3. 参与其他AGV配套软件功能研发",
+      "requirements": "任职资格\n1 熟悉常用的数据结构与算法 2 熟练使用java编程语言 3 语言表达清晰,无沟通障碍",
+      "source": "blueswords.zhiye.com",
+      "published_at": "2025-07-31T18:45:00"
+    }
+  ]
+}

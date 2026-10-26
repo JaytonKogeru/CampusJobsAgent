@@ -1,0 +1,9 @@
+{
+  "adapter": "beisen-zhiye",
+  "source_url": "https://weichai.zhiye.com/jobs",
+  "count": 0,
+  "warnings": [
+    "no dynamic category found for scope=campus; fallback=['2']"
+  ],
+  "jobs": []
+}
