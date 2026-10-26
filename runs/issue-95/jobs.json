@@ -1,0 +1,12 @@
+{
+  "adapter": "hcmcloud",
+  "source_url": "https://inspur.hcmcloud.cn/recruit",
+  "count": 0,
+  "warnings": [
+    "integrity unverified: HCMCloud ended on the first rendered page without stable multi-page evidence; jobs=0, upstream total=None, expected_pages=None",
+    "HCMCloud pager controls:\ntag=INPUT cls='ng-pristine ng-untouched ng-valid ng-empty' text='' title='' aria='' disabled=False value='' context='home-page ng-scope :: 社会招聘'",
+    "HCMCloud rendered no job rows; company=浪潮; reason=no-next-control; body_sample=社会招聘\n校园招聘\n实习生招聘\n登录\n|\n注册\nLanguage\n社会招聘",
+    "HCMCloud API trace:\n200 GET https://inspur.hcmcloud.cn/api/auth/get_customer_css\n200 GET https://inspur.hcmcloud.cn/api/language/get_language?lang=zh_cn\n200 GET https://inspur.hcmcloud.cn/api/auth/get_auth?app_type=recruit&v=0.239728340979135421793004788656&hcm_transfer_strategy=ha5\n200 POST https://inspur.hcmcloud.cn/api/recruit.job.class.setting.list\n200 POST https://inspur.hcmcloud.cn/api/recruit.get.company.info\n200 POST https://inspur.hcmcloud.cn/api/recruit.get.dept.template.info\n200 POST https://inspur.hcmcloud.cn/api/get_template\n200 POST https://inspur.hcmcloud.cn/api/hcm.ai.get.robot\n200 POST https://inspur.hcmcloud.cn/api/recruit.portal.setting.get.portal.info.by.name"
+  ],
+  "jobs": []
+}
